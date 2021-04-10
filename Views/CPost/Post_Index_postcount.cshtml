@@ -1,0 +1,12 @@
+﻿@*@model
+
+<ol class="nikki-pager" id="OrderData">
+    <li><a href="#div1"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> 上一頁</a></li>
+    @{ 
+        for (int i = 1; i < Model - 1; i++)
+        {
+            <li>i</li>
+        }
+    }
+    <li><a href="#div1">下一頁 <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
+</ol>*@

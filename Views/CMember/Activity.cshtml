@@ -1,0 +1,126 @@
+﻿<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <!-- jQuery v1.9.1 -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <!-- Moment.js v2.20.0 -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.0/moment.min.js"></script>
+    <!-- FullCalendar v3.8.1 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.1/fullcalendar.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.1/fullcalendar.print.css" rel="stylesheet" media="print">
+    
+    <link rel="icon" href="/index/img/core-img/favicon.ico">
+    <link rel="stylesheet" href="/index/Astyle.css">
+
+    <style>
+        td {
+            align-self: center;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.8.1/fullcalendar.min.js"></script>
+</head>
+<body>
+    <section class="contact-area section-padding-100-0">
+        <div class="container" style="margin-top:50px;margin-bottom:100px;">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="contact-content mb-100">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                        <form action="#">
+                            <table class="table table-hover">
+                                <tr>
+                                    <td>活動名稱: <span id="ArticleTitle"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動開始日期: <span id="startday"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動結束日期: <span id="endday"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動身份: <span id="identity"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動地點: <span id="location"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動目前人數: <span id="num"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動類型: <span id="cat"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>活動詳細: <span id="detail"></span></td>
+                                </tr>
+                            </table>
+                            <table class="table table-hover">
+                                <tr id="dis"></tr>
+                            </table>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+
+
+<script>
+    $('#calendar').fullCalendar({
+        
+        dayClick: function (date, event, view) {
+            console.log('add event');
+            console.log(date);
+            console.log(event);
+            console.log(view);
+        },
+        eventClick: function (inof) {
+
+            console.log('modify event');
+            
+            $('#ArticleTitle').html('');
+        //    $('#ArticleTitle').html('<td>' + JSON.stringify(inof.title) + '</td><td>' + JSON.stringify(inof.start) + '</td><td>' + JSON.stringify(inof.end) +'</td><td>主辦人</td><td>台北市</td><td><a href="#">活動詳細</a></td>');
+            $('#ArticleTitle').html(JSON.stringify(inof.title));
+            $('#startday').html(JSON.stringify(inof.start));
+            $('#endday').html(JSON.stringify(inof.end));
+            $('#identity').html(JSON.stringify(inof.extendedProps.identity));
+            $('#location').html(JSON.stringify(inof.extendedProps.location));
+            $('#num').html(JSON.stringify(inof.extendedProps.num));
+            $('#cat').html(JSON.stringify(inof.extendedProps.cat));
+            $('#detail').html('<a href="'+JSON.stringify(inof.extendedProps.detail)+'">活動詳細資料</a>');
+        },
+        
+    });
+    $('#calendar').fullCalendar('renderEvent', {
+        id: 'eventGroup1',
+        title: '打麻將',
+        start: moment().add(3, 'days').format('YYYY-MM-DD'),
+        textColor: 'black',
+        color: 'beige',
+        extendedProps: { 'identity': '參加人', 'num': '4/4', 'cat': '室內活動', 'detail': '#', 'location': '台北市' }
+
+    });
+    $('#calendar').fullCalendar('renderEvent', {
+        id: 'eventGroup1',
+        title: '釣魚',
+        start: moment().add(5, 'days').format('YYYY-MM-DD'),
+        textColor: 'black',
+        color: 'beige',
+        extendedProps: { 'identity': '參加人', 'num': '3/5', 'cat': '室外活動', 'detail': '#', 'location': '基隆市' }
+
+    });
+    $('#calendar').fullCalendar('renderEvent', {
+        id: 'eventGroup1',
+        title: '陽明山露營',
+        
+        start: '2021-03-21',
+        end:'2021-03-25',
+        textColor: 'black',
+        color: 'pink',
+        extendedProps: { 'identity': '主辦人', 'num': '5/10', 'cat': '室內活動', 'detail':'#','location':'新北市'}
+    });
+</script>

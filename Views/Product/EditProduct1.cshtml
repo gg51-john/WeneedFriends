@@ -1,0 +1,103 @@
+﻿@model new_layout_core.ViewModel.tProductViewModel
+
+<h4 style="text-align:center" >修改商品</h4>
+<hr />
+<script src="~/js/jquery-3.3.1.min.js"></script>
+
+<div class="card "  style="text-align:center; width:500px;height:auto;margin:0 35%">
+    <div class="card-header">
+        <form asp-action="EditProduct1" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FProductId" class="control-label"></label>
+                <input asp-for="FProductId" class="form-control" />
+                <span asp-validation-for="FProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FProductName" class="control-label"></label>
+                <input asp-for="FProductName" class="form-control" />
+                <span asp-validation-for="FProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FProductQty" class="control-label"></label>
+                <input asp-for="FProductQty" class="form-control" />
+                <span asp-validation-for="FProductQty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FProductPrice" class="control-label"></label>
+                <input asp-for="FProductPrice" class="form-control" />
+                <span asp-validation-for="FProductPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FProductCategoryId" class="control-label"></label><br />
+                <select asp-for="FProductCategoryId" class="form-control">
+                    @{ var q = new WeNeedFriendsFINContext().TProductCategories.Select(f => f.FCategoryName);
+                        foreach (var a in q)
+                        {                            <option value="@a">@a</option>                        }                    }
+                </select>
+            </div>
+            <br />
+            <br />
+            <div class="form-group">
+                <label asp-for="Size" class="control-label"></label><br />
+                <select asp-for="Size" class="form-control">
+                    @{ var e = new WeNeedFriendsFINContext().TSizeIds.Select(f => f.FSizeName);
+                        foreach (var a in e)
+                        {                            <option value="@a">@a</option>                        }                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="FProductDescription" class="control-label"></label>
+                <input asp-for="FProductDescription" class="form-control" />
+                <span asp-validation-for="FProductDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pics" class="control-label"></label>
+                <input type="file" class="form-control" multiple onchange="loadpic(event)" name="imgs" />
+                <span asp-validation-for="Pics" class="text-danger"></span>
+                <div class="form-group" id="picdiv" style="width:100%;height:500px;overflow:scroll">
+                    @{ int count = 0;}
+                    @{ foreach (var a in Model.Pics)
+                        {
+                            count++; <img src="@Url.Content(a.FProductPicPath)" id="@a.Fid" name="img" /> } }
+                </div>
+                    <script>
+                        $('img').click(function () {
+                            var img = $(this).attr("id");
+                            console.log(img)
+                            $.ajax({
+                                url: "/Shopping/RemoveImg",
+                                data: { img: img },
+                                type: "post",
+                                cache: false
+                            });
+                            $(this).remove();
+                        });
+
+                        $('#save').click(function () { alert("儲存成功"); });
+
+                        function loadpic(event) {
+                            var picdiv = document.getElementById("picdiv");
+                            for (var i = 0; i < event.target.files.length; i++) {
+                                var img = document.createElement("img");
+                                img.addEventListener("click", function () { (this).remove(); })//新增事件
+                                img.src = URL.createObjectURL(event.target.files[i]);
+                                picdiv.appendChild(img);
+                            };
+                        };
+                    </script>
+            </div>  
+            <div class="form-group">
+                <input type="submit" value="儲存" class="btn btn-primary" id="save" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,170 @@
+﻿@model new_layout_core.ViewModel.CPostViewModel
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="~/js/jquery-3.3.1.min.js"></script>
+<section class="blog-content-area section-padding-0-100" style="padding-top:60px;">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <!-- Blog Posts Area -->
+            <div class="col-12 col-lg-8">
+                <div class="blog-posts-area">
+                    <div class="row">
+
+                        <!-- Section Heading -->
+                        <div class="col-12">
+                            <div class="section-heading">
+                                <h2>修改活動</h2>
+                                <p>去哪玩</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="room-booking ">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                            <div class="row" >
+                                <div class="col-12 col-lg-6">
+                                    <input type="hidden" asp-for="FPostId" />
+                                    <div class="check-date">
+                                        <label for="NewPostTitle">活動名稱:</label>
+                                        <input type="text" id="NewPostTitle" class="form-control" placeholder="活動名稱..." asp-for="FTitle" required>
+                                        <span asp-validation-for="FTitle" class="text-danger"></span>
+                                    </div>
+                                    <div class="check-date">
+                                        <label for="date-in">出發日期:</label>
+                                        <input type="text" class="date-input" id="date-in" asp-for="FPostTime" required>
+                                        <span asp-validation-for="FPostTime" class="text-danger"></span>
+                                        <i class="icon_calendar"></i>
+                                    </div>
+                                    <div class="select-option">
+                                        <label for="guest">Category2:</label>
+                                        <select id="guest" asp-for="FSportName"required>
+                                            @{ var sport = new WeNeedFriendsFINContext().TSports.Select(n => n.FSportName).ToList();}
+                                            @foreach (var s in sport)
+                                            {
+                                                <option>@s</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="FSportName" class="text-danger"></span>
+                                    </div>
+                                    <div class="select-option">
+                                        <label for="room">開團人數:</label>
+                                        <select id="room" asp-for="FPeople" required>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        <span asp-validation-for="FPeople" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group" id="div">
+                                        <label asp-for="photo" class="control-label"></label>
+                                        <input type="file" name="image" class="form-control" multiple onchange="loadFile(event)"/>
+                                        <span asp-validation-for="photo" class="text-danger"></span>
+                                        @{int count = 0; }
+                                        @foreach (var i in Model.photo)
+                                        {
+                                            count++;
+                                            <img src="@Url.Content(i.FPostPhoto)" id="@i.FPostPhotoId" name="img" width="480" height="360" />
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="select-option">
+                                        <label for="room">縣市:</label>
+                                        <select id="myselect" asp-for="FPostCity" onchange="change()" required>
+                                            <option>請選擇</option>
+                                            @{ var city = new WeNeedFriendsFINContext().TCities.Select(n => n.FCityName).ToList();}
+                                            @foreach (var i in city)
+                                            {
+                                                <option>@i</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="FPostCity" class="text-danger"></span>
+                                    </div>
+                                    <div class="select-option" id="div_地區">
+                                        <label for="room">地區:</label>
+                                        <select id="district" asp-for="FPostDistrict" required>
+                                            <option value="">請選擇</option>
+                                        </select>
+                                        <span asp-validation-for="FPostDistrict" class="text-danger"></span>
+                                    </div>
+                                    <div class="check-date">
+                                        <label for="address">詳細位置:</label>
+                                        <input type="text" id="address" class="form-control" placeholder="address..." asp-for="FPostAddress" required>
+                                        <span asp-validation-for="FPostAddress" class="text-danger"></span>
+                                    </div>
+                                    <div class="check-date">
+                                        <label for="address">活動內容:</label>
+                                        <textarea rows="6" cols="40" class="form-control" asp-for="FDescription" required></textarea>
+                                        <span asp-validation-for="FDescription" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="justify-content:center">
+                                <div class="col-2">
+                                    <button type="submit" style="width:5em">修改</button>
+                                </div>
+                                <div class="col-2">
+                                    <button type="reset" style="width:5em;color:red" onclick="history.back()">回上一頁</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+
+<script>
+    function loadFile(event) {
+        var div = document.getElementById("div");
+        for (var i = 0; i < event.target.files.length; i++) {
+            var img = document.createElement("img");
+            img.setAttribute("name", "img");
+            img.width = "480";
+            img.height = "360";
+            img.addEventListener("click", function () { (this).remove(); }) //新增事件
+            img.src = URL.createObjectURL(event.target.files[i]);
+            div.appendChild(img);
+        };
+    };
+    $('img').click(function () {
+        var img = $(this).attr("id");
+        console.log(img)
+        $.ajax({
+            url: "/TestProduct/EditTest",
+            data: { img: img },
+            type: "post",
+            cache: false,
+        });
+        $(this).remove();
+    });
+    function change() {
+        var city = document.getElementById("myselect").value;
+        var sp = $("div #div_地區").children("select").next("div").children("span");
+        sp.text("請選擇");
+        $.ajax({
+            url: "/CPostCRUD/getDistrict/",
+            data: { city: city },
+            type: "post",
+            success: function (response) {
+                txt = "";
+                var h = $("div #div_地區").children("select").next("div").children("ul");
+                var lii = h.children("li");
+                lii.remove();
+                $("#district option").remove();
+                for (var i = 0; i < response.length; i++) {
+                    $("#district").append($("<option value='" + response[i] + "'>" + response[i] + "</option > "));
+                    txt = "<li class=option data-value='" + response[i] + "'>" + response[i] + "</li > ";
+                    h.append(txt);
+                }
+            }
+        });
+    }
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

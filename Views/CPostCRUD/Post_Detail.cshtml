@@ -1,0 +1,237 @@
+﻿
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+
+<!-- ##### Breadcrumb Area Start ##### -->
+<div class="breadcrumb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#"><i class="fa fa-home"></i> 首頁</a></li>
+                        <li class="breadcrumb-item"><a href="#">活動列表</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">活動名稱</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ##### Breadcrumb Area End ##### -->
+<!-- Room Details Section Begin -->
+<section class="room-details-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="room-details-item">
+                    @*@foreach (var img in Model.photo)
+                    {
+                    <img src="@Url.Content(img.FPostPhoto)" alt="">
+                    }*@
+                    <div class="rd-text">
+                        <div class="rd-title">
+                            <h3 style="font-weight:700"></h3>
+                            <div class="rdt-right">
+                                <div class="rating">
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star-half_alt"></i>
+                                </div>
+                                <a href="#" style="margin-right:10px">Join Now</a><a href="#" style="margin-right:10px">追蹤</a> <a href="#"><i class=" icon_heart_alt">  </i><span>999</span></a>
+                            </div>
+                        </div>
+                        <h2>類型<span>小類</span></h2>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="r-o"><i class="icon_calendar"></i>Date:</td>
+                                    <td><span>yyyyMMdd</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="r-o"><i class="icon_profile"></i>Person:</td>
+                                    <td><span>1</span>/<span>10</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="r-o"><i class="icon_pin_alt"></i>Address:</td>
+                                    <td>Wifi, Television, Bathroom,...</td>
+                                </tr>
+                                <tr>
+                                    <td class="r-o"><i class="icon_clock_alt"></i>報名時間:</td>
+                                    <td><span>倒數</span>time</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="f-para">
+                            Motorhome or Trailer that is the question for you. Here are some of the
+                            advantages and disadvantages of both, so you will be confident when purchasing an RV.
+                            When comparing Rvs, a motorhome or a travel trailer, should you buy a motorhome or fifth
+                            wheeler? The advantages and disadvantages of both are studied so that you can make your
+                            choice wisely when purchasing an RV. Possessing a motorhome or fifth wheel is an
+                            achievement of a lifetime. It can be similar to sojourning with your residence as you
+                            search the various sites of our great land, America.
+                        </p>
+                        <p>
+                            The two commonly known recreational vehicle classes are the motorized and towable.
+                            Towable rvs are the travel trailers and the fifth wheel. The rv travel trailer or fifth
+                            wheel has the attraction of getting towed by a pickup or a car, thus giving the
+                            adaptability of possessing transportation for you when you are parked at your campsite.
+                        </p>
+                    </div>
+                </div>
+                <div class="rd-reviews">
+                    <h4>評論</h4>
+                    <div class="review-item">
+                        <div class="ri-pic">
+                            <img src="/img/room/avatar/avatar-1.jpg" alt="">
+                        </div>
+                        <div class="ri-text">
+                            <span>27 Aug 2019</span>
+                            <div class="rating">
+                                <i class="icon_star"></i>
+                                <i class="icon_star"></i>
+                                <i class="icon_star"></i>
+                                <i class="icon_star"></i>
+                                <i class="icon_star-half_alt"></i>
+                            </div>
+                            <h5>Brandon Kelley</h5>
+                            <p>
+                                Neque porro qui squam est, qui dolorem ipsum quia dolor sit amet, consectetur,
+                                adipisci velit, sed quia non numquam eius modi tempora. incidunt ut labore et dolore
+                                magnam.
+                            </p>
+                            <hr />
+                            @*留言區*@
+                            <div class="review-item">
+                                <div class="ri-pic">
+                                    <img src="/img/room/avatar/avatar-1.jpg" style="width:80%;height:80%;margin:0" alt="" >
+                                </div>
+                                <div class="ri-text">
+                                    <span>27 Aug 2019</span>
+                                    <h5>Brandon Kelley</h5>
+                                    <p>
+                                        Neque porro qui squam est, qui dolorem ipsum quia dolor sit amet.
+                                    </p><hr />
+                                </div>
+                            </div>
+
+                            @*留言區*@
+                            <div class="review-add">
+                                <form action="#" class="ra-form">
+                                    <textarea placeholder="Your Review"></textarea>
+                                    <button type="submit" style="justify-items:end">回覆</button>
+                                    <hr />
+                                </form>
+                            </div>
+
+                        </div>
+
+
+                        <div class="review-item">
+                            <div class="ri-pic">
+                                <img src="/img/room/avatar/avatar-2.jpg" alt="">
+                            </div>
+                            <div class="ri-text">
+                                <span>27 Aug 2019</span>
+                                <div class="rating">
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star"></i>
+                                    <i class="icon_star-half_alt"></i>
+                                </div>
+                                <h5>Brandon Kelley</h5>
+                                <p>
+                                    Neque porro qui squam est, qui dolorem ipsum quia dolor sit amet, consectetur,
+                                    adipisci velit, sed quia non numquam eius modi tempora. incidunt ut labore et dolore
+                                    magnam.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-add">
+                        <h4>Add Review</h4>
+                        <form action="#" class="ra-form">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <input type="text" placeholder="Name*">
+                                </div>
+                                <div class="col-lg-6">
+                                    <input type="text" placeholder="Email*">
+                                </div>
+                                <div class="col-lg-12">
+                                    <div>
+                                        <h5>You Rating:</h5>
+                                        <div class="rating">
+                                            <i class="icon_star"></i>
+                                            <i class="icon_star"></i>
+                                            <i class="icon_star"></i>
+                                            <i class="icon_star"></i>
+                                            <i class="icon_star-half_alt"></i>
+                                        </div>
+                                    </div>
+                                    <textarea placeholder="Your Review"></textarea>
+                                    <button type="submit">留言</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="rd-reviews">
+                    <h3 style="margin-bottom:10px">Leader</h3>
+                    <div class="review-item">
+                        <div class="ri-pic">
+                            <img src="/img/room/avatar/avatar-2.jpg" alt="">
+                        </div>
+                        <div class="ri-text">
+                            <span>27 Aug 2019</span>
+                            <h5>Brandon Kelley</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="rd-reviews">
+                    <h3 style="margin-bottom:10px">Member</h3>
+                    @{
+                        for (var i = 0; i < 5; i++)
+                        {
+
+                            <div class="review-item">
+                                <div class="ri-pic">
+                                    <img src="/img/room/avatar/avatar-2.jpg" alt="">
+                                </div>
+                                <div class="ri-text">
+                                    <h5>Brandon Kelley</h5>
+                                    <span>yyyymmdd</span><span>  加入</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="rd-reviews">
+                    <h3 style="margin-bottom:10px">候補</h3>
+                    @{
+                        for (var i = 0; i < 2; i++)
+                        {
+                            <div class="review-item">
+                                <div class="ri-pic">
+                                    <img src="/img/room/avatar/avatar-2.jpg" alt="">
+                                </div>
+                                <div class="ri-text">
+                                    <h5>Brandon Kelley</h5>
+                                    <span>yyyymmdd</span><span>  申請</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Room Details Section End -->

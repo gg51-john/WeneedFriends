@@ -1,0 +1,1091 @@
+﻿@{Layout = null;}
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+    ViewBag.USERPHOTO = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERPHOTO);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - layout_test</title>
+    <link href="~/dashboardlib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/dashboardcss/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" />
+    <link href="~/dashboardcss/core.css" rel="stylesheet" />
+    <link href="~/dashboardcss/profilecard.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background: #FCFCFC;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div class="vertical-nav bg-dark" id="sidebar">
+            <div class="py-4 px-3 mb-4 bg-dark" style="border-bottom:1px solid #4f5962">
+                <div class="media-body">
+                  <a href="#" id="back-to-home"><h4 class="font-weight-white mb-0" style="margin-left:23px;color:white">魔人揪揪</h4></a>   
+                </div>
+            </div>
+            <div class="mt-1 pb-3 mb-3 d-flex" style="border-bottom:1px solid #4f5962">
+                <div id="manager-image">
+                    <img src="@ViewBag.USERPHOTO" width="45" height="45" class="rounded-circle" style="margin-left:23px;margin-top:9px" />
+                </div>
+                <div style="margin-left:20px;margin-top:18px" id="manager-name">
+                    <a href="#" class="d-block" style="color:white">@ViewBag.USER</a>
+                </div>
+            </div>
+            <p class="text-white font-weight-bold text-uppercase px-3 small pb-4 mb-0">主項目</p>
+
+            <ul class="nav flex-column bg-dark mb-0">
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic bg-dark" id="dashboard">
+                        <i class="fa fa-th-large mr-3 text-primary fa-fw"></i>
+                        儀錶板
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic" id="member">
+                        <i class="fa fa-address-card mr-3 text-primary fa-fw"></i>
+                        會員管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic" id="article">
+                        <i class="fa fa-cubes mr-3 text-primary fa-fw"></i>
+                        文章管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic" id="act">
+                        <i class="fa fa-picture-o mr-3 text-primary fa-fw"></i>
+                        活動管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic" id="report">
+                        <i class="fa fa-picture-o mr-3 text-primary fa-fw"></i>
+                        留言/檢舉管理
+                    </a>
+                </li>
+            </ul>
+
+            <p class="text-gray font-weight-bold text-uppercase px-3 small py-4 mb-0">子項目</p>
+
+            <ul class="nav flex-column bg-dark mb-0">
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light font-italic" id="newsletter">
+                        <i class="fa fa-area-chart mr-3 text-primary fa-fw"></i>
+                        電子報製作
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="page-content p-5" id="content">
+            <div class="navbar">
+                <button id="sidebarCollapse" type="button" class=" rounded-pill shadow-sm px-4 mb-4">
+                    <i class="fa fa-bars mr-2"></i><small class="text-uppercase font-weight-bold">
+                        <img src="~/images/$RSRM1K4.svg" />
+                    </small>
+                </button>
+                <button type="button" onclick="logout()" style="float:right" class="btn btn-info">登出</button>
+            </div>
+            <!-- Toggle button -->
+            <!-- Demo content -->
+            @*<h1 class="display-4 text-white">Fixed Bootstrap 4 Vertical Sidebar Navigation</h1>*@
+
+
+            <div class="container-fluid" style="box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);" id="div-body">
+                <div id="div-title">
+
+                </div>
+
+                <main role="main" class="pb-3" id="div01">
+                    <div id="div-btn">
+
+                    </div>
+
+                    <div id="div-table">
+
+                    </div>
+
+                    <div id="div-del">
+
+                    </div>
+                </main>
+            </div>
+
+
+
+            <div class="separator"></div>
+            <div class="row text-white">
+                <div class="col-lg-5">
+                </div>
+            </div>
+        </div>
+    </div>
+    @* 會員用的form *@
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">會員新增</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group" style="display:none">
+                            <label for="EmployeeId">ID</label>
+                            <input type="text" class="form-control" id="Id" placeholder="Id" disabled="disabled" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Name">Email</label>
+                            <input type="text" class="form-control" id="Email" placeholder="Email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Age">姓名</label>
+                            <input type="text" class="form-control" id="Name" placeholder="Name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Age">電話</label>
+                            <input type="text" class="form-control" id="Phone" placeholder="Phone" />
+                        </div>
+                        <div class="form-group">
+                            <label for="pic">上傳照片</label>
+                            <input type="file" class="form-control" id="pic" placeholder="pic" />
+                        </div>
+                        <div class="form-group" style="display:none">
+                            <label for="Age">狀態</label>
+                            <input type="text" class="form-control" id="status" placeholder="status" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnAdd">Add</button>
+                    <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*會員detailform*@
+    <div class="modal fade" id="profilecard" tabindex="-1" role="dialog" aria-labelledby="profilecard" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="user-profile-title">使用者個人資料</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="container emp-profile">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="profile-img">
+                                <img src="@ViewBag.USERPHOTO" id="user-detail-photo" />
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-head">
+                                <h5 id="user-detail-name1">
+                                    Kshiti Ghelani
+                                </h5>
+                                @*<h6>
+                                        Web Developer and Designer
+                                    </h6>*@
+                                <p>狀態 : <span id="user-detail-status">正常</span></p>
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="home-tab">詳細資料</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="profile-work">
+                                <label>姓名</label>&nbsp&nbsp
+                                <label id="user-detail-name2">超揪揪</label><br />
+                                <label>性別</label>&nbsp&nbsp
+                                <label id="user-detail-gender">男</label><br />
+                                <label id="send-password"></label>&nbsp&nbsp
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="tab-content profile-tab" id="myTabContent">
+                                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                    @*<div class="row">
+                                            <div class="col-md-5">
+                                                <label>User Id</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>Kshiti123</p>
+                                            </div>
+                                        </div>*@
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label>Email</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p id="user-detail-email">gg51gggg@gmail.com</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label>手機</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p id="user-detail-phone">0922097375</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label>註冊日期</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p id="user-detail-jointime"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*送信*@
+    <div class="modal fade" id="emailform" tabindex="-1" role="dialog" aria-labelledby="myemailform" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myemailform">Email</h4>
+                    <button type="button" class="close" data-dismiss="modal" id="emailformclose">×</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="To">收件者</label>
+                            <input type="text" class="form-control" id="To" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Subject">主旨</label>
+                            <input type="text" class="form-control" id="Subject" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Body">內容</label>
+                            <textarea class="form-control" id="Body"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnsendmail">送出</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="dismissmail">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*文章新增form*@
+    <div class="modal fade" id="articleModal" tabindex="-1" role="dialog" aria-labelledby="myarticlemodal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myarticlemodal">文章新增</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group" style="display:none">
+                            <label for="EmployeeId">articleid</label>
+                            <input type="text" class="form-control" id="articleid" placeholder="articleid" disabled="disabled" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Name">標題</label>
+                            <input type="text" class="form-control" id="articletitle" placeholder="articletitle" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Age">內容</label>
+                            <input type="text" class="form-control" id="artcontent" placeholder="artcontent" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="articleadd">新增</button>
+                    <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*活動新增form*@
+    <div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-labelledby="mypostModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="mypostModal">活動新增</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+
+                        <div class="form-group">
+                            <label for="Name">活動名稱</label>
+                            <input type="text" class="form-control" id="posttitle" placeholder="posttitle" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Age">活動內容</label>
+                            <input type="text" class="form-control" id="postcontent" placeholder="postcontent" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="postAdd">Add</button>
+                    <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="Update();">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/dashboardlib/jquery/dist/jquery.min.js"></script>
+    <script src="~/dashboardlib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="~/dashboardjs/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="~/dashboardjs/core.js"></script>
+    @*寄mail*@
+    <script>
+        function sendmail(id) {
+            $.ajax({
+                url: "/Dashboard/getmemberid/" + id,
+                type: "GET",
+                dataType: "Json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        $("#To").val(item.fEmail);
+                        $("#Subject").val('魔人揪揪團隊發送');
+                    })
+                    $('#emailform').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        $("#btnsendmail").click(function () {
+            var kkk = {
+                to: $("#To").val(),
+                subject: $("#Subject").val(),
+                body: $("#Body").val(),
+            };
+
+            $.ajax({
+                url: "/Dashboard/hhh",
+                type: "post",
+                dataType: "json",
+                data: kkk,
+                success: function (data) {
+                    $('#emailform').modal('hide');
+                    $("#Body").val("");
+                },
+                error: {}
+            });
+        })
+        $("#emailformclose").click(function () {
+            $("#Body").val("");
+        })
+        $("#dismissmail").click(function () {
+            $("#Body").val("");
+        })
+    </script>
+    <script>
+        //回首頁
+        $("#back-to-home").click(function () {
+            window.location.href = "/Home/Index"
+        })
+        //時間
+        function datetimenow() {
+            var d = new Date();
+            var y = d.getFullYear();
+            var m = d.getMonth() + 1;
+            var k = d.getDate();
+            var h = d.getHours();
+            var t = d.getMinutes();
+            var s = d.getSeconds();
+            if (k < 10) {
+                k = "0" + k;
+            }
+            if (m < 10) {
+                m = "0" + m;
+            }
+            if (h == 0) {
+                h = "0" + h;
+            }
+            if (t < 10) {
+                t = "0" + t;
+            }
+            if (s < 10) {
+                s = "0" + s;
+            }
+
+            return (y + '/' + m + '/' + k);
+        }
+        //預設權限
+        function status() {
+            var state = 1;
+            return state;
+        }
+        //修改權限(狀態)
+        function changestatus(ID) {
+            var ans = confirm("確定修改?");
+            if (ans) {
+                $.ajax({
+                    url: "/Dashboard/changestatus/" + ID,
+                    type: "post",
+                    dataType: "Json",
+                    success: function (data) {
+                        showmemberlist()
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+
+        /*按下Add重置textbox*/
+        function clearTextBox() {
+            $(".form-control").val("");
+            $('#btnUpdate').hide();
+            //$('#btnAdd').show();
+        };
+
+        //開始載入
+        $(document).ready(function () {
+            showmemberlist();
+        });
+        //寄給所有人
+        function sendtoall() {
+            $.ajax({
+                url: "/Dashboard/findemail/",
+                type: "GET",
+                dataType: "Json",
+                success: function (result) {
+                    $("#To").val(result);
+                    $("#to-div").css("display", "none");
+                    $("#Subject").val('魔人揪揪團隊發送');
+
+                    $('#emailform').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //電子報
+        function senddm() {
+            var kkk = {
+                subject: '魔人揪揪團隊發送',
+                body: '<img src="https://www.sendinblue.com/wp-content/uploads/2018/03/Jins-newsletter.png" />'
+            };
+            $.ajax({
+                url: "/Dashboard/DM/",
+                type: "post",
+                data: kkk,
+                dataType: "Json",
+                success: function (result) {
+                    alert('發送成功')
+                    //$("#To").val(result);
+                    //$("#to-div").css("display", "none");
+                    //$("#Subject").val('魔人揪揪團隊發送');
+                    //$("#Body").html('<img src="https://www.sendinblue.com/wp-content/uploads/2018/03/Jins-newsletter.png" />');
+                    //$('#emailform').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //改狀態顏色
+        function color() {
+            $(".status-color").each(function () {
+                var item = $(this).text();
+                if (item == '一般會員')
+                    $(this).css("color", "green");
+                if (item == '停權')
+                    $(this).css("color", "red");
+            })
+        }
+
+        //顯示所有會員()
+        function showmemberlist() {
+            $.ajax({
+                url: "/Dashboard/loadmember",
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="table" style="text-align:center;"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>圖片<th>會員姓名<th>手機號碼<th>電子信箱<th>註冊日期<th>目前狀態<th>操作<th>寄信</tr>';
+                    var html = '';
+                    var title = '<lable><h2>所有會員</lable>&nbsp&nbsp<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="clearTextBox();">+新增會員</button>&nbsp'
+                    title += '<button type="button" class="btn btn-danger" id="del-member">刪除</button>&nbsp<button type="button" class="btn btn-success" id="del-sendmail" onclick="sendtoall()">寄信</button>&nbsp';
+                    title += '<button type="button" class="btn btn-success" id="send-dm" onclick="senddm()">電子報</button>&nbsp'
+                    //title += '<lable style="font-size:medium; display:none" id="show-lable">天 :</label>&nbsp<input type ="number" id ="day-count" min ="0" max ="9999" />&nbsp&nbsp<label> 時 :&nbsp<input type ="number" id ="hour-count" min ="0" max ="9999"/>&nbsp&nbsp'
+                    //title += '<label>分 :</label >&nbsp<input type ="number" id ="min-count" min ="0" max ="9999"/>&nbsp<input type ="button" onclick ="uuu()" value ="確認" class="btn btn-primary btn-sm" >'
+
+                    $.each(result, function (key, item) {
+                        var memberstatus = "";
+                        if (item.fstatus == 1) {
+                            memberstatus = '一般會員'
+                        }
+                        else if (item.fstatus == 2) {
+                            memberstatus = '停權'
+                        }
+                        else if (item.fstatus == 3) {
+                            memberstatus = '管理員'
+                        }
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="memberdelete" id="memberdelete" value="' + item.fUserId + '"/></td>';
+                        html += '<td style="background-image:url( ' + item.fUserPhoto + '); width:55px;height:30px;background-repeat:no-repeat;background-size: 100%;" id="testtd"></td>';
+                        html += '<td>' + item.fUserName + '</td>';
+                        html += '<td>' + item.fUserPhone + '</td>';
+                        html += '<td>' + item.fEmail + '</td>';
+                        html += '<td>' + item.fJoinTime + '</td>';
+                        html += '<td class="status-color">' + memberstatus + '</td>';
+                        html += '<td><a href="#" onclick="return getbymemberID(' + item.fUserId + ')"><img src="/images/pen.svg" /></a> | <a href="#" id="click" onclick="changestatus(' + item.fUserId + ')"><img src="/images/trash.svg" /></a></td>';
+                        html += '<td><a href="#" onclick="return sendmail(' + item.fUserId + ')"><img src="/images/envelope.svg" /></a>';
+                        html += '</tr>';
+
+
+                    });
+                    $("#div-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#div-title').html(title);
+                    $("#table").dataTable({
+                        "language": {
+                            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                        },
+                        "bDestroy": true
+                    });
+
+                    color()
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    </script>
+    <script>
+        //切換會員頁面
+        $("#member").click(function () {
+
+            showmemberlist()
+
+        })
+        //新增會員
+        $("#btnAdd").click(function () {
+            var formData = new FormData();
+            formData.append("fUserName", $("#Name").val());
+            formData.append("fEmail", $("#Email").val());
+            formData.append("fUserPhone", $("#Phone").val());
+            formData.append("FJoinTime", datetimenow());
+            formData.append("fstatus", status());
+            formData.append('image', $('input[type=file]')[0].files[0]);
+
+            //var data = new FormData(document.getElementById("memberform"));
+            //console.log([data.keys()].length);
+            //var formData = new FormData($('#pic')[0]);
+            //var member = {
+            //    fUserName: $("#Name").val(),
+            //    fEmail: $("#Email").val(),
+            //    fUserPhone: $("#Phone").val(),
+            //    FJoinTime: datetimenow(),
+            //    fstatus: status(),
+
+            //};
+            $.ajax({
+                url: "/Dashboard/memberAdd",
+                type: "POST",
+                data: formData,
+                dataType: "Json",
+                //formdata專用
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data != null) {
+                        showmemberlist()
+                        $('#myModal').modal("hide");
+                        $('#btnAdd').show();
+
+                    } else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        })
+        //會員deleteall
+        $(document).on('click', '#del-member', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+
+            $.ajax({
+                url: "/Dashboard/memberdeleteall",
+                type: "Post",
+                data: { id: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showmemberlist()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+
+        //修改會員資料
+        function Update() {
+            var member = {
+                fUserId: $("#Id").val(),
+                fUserName: $("#Name").val(),
+                fEmail: $("#Email").val(),
+                fUserPhone: $("#Phone").val(),
+            };
+            $.ajax({
+                url: "/Dashboard/memberupdate",
+                data: member,
+                type: "POST",
+                dataType: "Json",
+                success: function (result) {
+                    showmemberlist();
+                    $('#myModal').modal('hide');
+                    $(".form-control").val("");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        ////寄信
+        //function sendmail(id) {
+        //    $('#emailform').modal('show');
+        //}
+        //讀取會員資料
+        function getbymemberID(memberID) {
+            //$('#profilecard').modal('show');
+
+            $.ajax({
+                url: "/Dashboard/getmemberid/" + memberID,
+                type: "GET",
+                dataType: "Json",
+                success: function (result) {
+                    //each方法
+                    $.each(result, function (key, item) {
+                        //權限顯示
+                        var memberstatus = "";
+                        if (item.fstatus == 1) {
+                            memberstatus = '一般會員'
+                        }
+                        else if (item.fstatus == 2) {
+                            memberstatus = '訪客'
+                        }
+                        else if (item.fstatus == 3) {
+                            memberstatus = '管理員'
+                        } $("#user-detail-name1").html(item.fUserName);
+                        $("#user-detail-name2").html(item.fUserName);
+                        $("#user-detail-status").html(memberstatus);
+                        $("#user-detail-gender").html("未知");
+                        $("#user-detail-email").html(item.fEmail);
+                        $("#user-detail-jointime").html(item.fJoinTime);
+                        $("#user-detail-phone").html(item.fUserPhone);
+                        $("#user-detail-photo").html(item.fUserPhoto);
+                        var html = "";
+                        html = '<button type="button" onclick="return sendpasswordid(' + item.fUserId + ')">發送密碼</button>';
+                        $("#send-password").html(html);
+                    })
+                    $('#profilecard').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            return false;
+        }
+        //發送密碼
+        function sendpasswordid(id) {
+            $.ajax({
+                url: "/Dashboard/sendpasswordemail/",
+                type: "post",
+                dataType: "Json",
+                data: { id: id },
+                success: function (result) {
+                    if (result)
+                        alert("發送成功");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    </script>
+    <script>
+        //顯示所有文章
+        function showarticlelist() {
+            $.ajax({
+                url: "/Dashboard/loadarticle",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="articletable" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>文章標題';
+                    thead += '<th>建立者<th>發文日期<th>編輯/刪除'
+                    var title = '<lable><h2>所有文章</lable>&nbsp&nbsp<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#articleModal" onclick="clearTextBox();">+新增文章</button>&nbsp';
+                    title += '<button type="button" class="btn btn-danger" id="delbtn">刪除</button></br>';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="articledelete" id="articledelete" value="' + item.articleid + '"/></td>';
+                        html += '<td>' + item.title + '</td>';
+                        html += '<td>' + item.username + '</td>';
+                        html += '<td>' + item.date + '</td>';
+                        html += '<td><a href="#" onclick="return getbyID(' + item.articleid + ')"><img src="/images/pen.svg" /></a> | <a href="#" onclick="Delele(' + item.articleid + ')"><img src="/images/trash.svg" /></a></td>';
+                        html += '</tr>';
+
+                    });
+                    $("#div-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    //$('#div-btn').html(btn);
+                    //$('#div-del').html(deletebtn);
+                    $('#div-title').html(title);
+                    $("#articletable").dataTable(
+                        {
+                            "language": {
+                                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                            },
+                            "bDestroy": true
+                        }
+                    );
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //新增文章
+        $("#articleadd").click(function () {
+            var article = {
+                artTitle: $("#articletitle").val(),
+                artContent: $("#artcontent").val(),
+                userId: 1044,
+                date: datetimenow(),
+            };
+            $.ajax({
+                url: "/Dashboard/articleAdd",
+                type: "POST",
+                data: article,
+                dataType: "Json",
+                success: function (data) {
+                    if (data != null) {
+                        showarticlelist()
+                        $('#articleModal').modal("hide");
+
+                    } else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        })
+        //deleteall
+        $(document).on('click', '#delbtn', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                    /*alert(selectedall);*/
+                }
+            })
+
+            $.ajax({
+                url: "/Dashboard/articledeleteall",
+                type: "Post",
+                data: { id: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showarticlelist()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+        //checkbox控制
+        $(function () {
+            $(document).on('click', '.checkall', function () {
+                $("input[type=checkbox]").prop('checked', $(this).prop('checked'));
+
+            });
+            $(document).on('click', 'input[type=checkbox]', function () {
+                if (!$(this).prop("checked")) {
+                    $(".checkall").prop("checked", false)
+                }
+            })
+        });
+
+
+        //切換文章頁面
+        $("#article").click(function () {
+            showarticlelist()
+        })
+    </script>
+    <script>
+        //所有活動
+        function showactlist() {
+            $.ajax({
+                url: "/Dashboard/actlist",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="posttable" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" name="allcheck" id="selectall" class="checkall" /></th><th>活動標題<th>活動內容<th>建立者';
+                    thead += '<th>發文日期<th>動作'
+                    var title = '<lable><h2>所有活動</lable>&nbsp&nbsp<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#postModal" onclick="clearTextBox();">+新增活動</button>&nbsp';
+                    title += '<button type="button" class="btn btn-danger" id="delete-post">刪除</button></br>';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="articledelete" id="articledelete" value="' + item.fPostId + '"/></td>';
+                        //html += '<td>' + item.FPostId + '</td>';
+                        //html += '<td>' + item.FUserId + '</td>';
+                        html += '<td>' + item.fTitle + '</td>';
+                        html += '<td>' + item.fDescription + '</td>';
+                        html += '<td>' + item.name + '</td>';
+                        html += '<td>' + item.fPostTime + '</td>';
+                        html += '<td><a href="#" onclick="return getbyID(' + item.fPostId + ')"><img src="/images/pen.svg" /></a> | <a href="#" onclick="Delele(' + item.fPostId + ')"><img src="/images/trash.svg" /></a></td>';
+                        html += '</tr>';
+
+                    });
+                    $("#div-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#div-title').html(title);
+                    $("#posttable").dataTable(
+                        {
+                            "language": {
+                                url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                            },
+                            "bDestroy": true
+                        }
+                    );
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //切換活動頁面
+        $("#act").click(function () {
+            showactlist()
+        })
+        //新增活動
+        $("#postAdd").click(function () {
+            var post = {
+                fTitle: $("#posttitle").val(),
+                fDescription: $("#postcontent").val(),
+                fUserID: 1044,
+                fPostTime: datetimenow(),
+                fSystemTime: datetimenow(),
+            };
+            $.ajax({
+                url: "/Dashboard/postAdd",
+                type: "POST",
+                data: post,
+                dataType: "Json",
+                success: function (data) {
+                    if (data != null) {
+                        showactlist()
+                        $('#postModal').modal("hide");
+
+                    } else {
+                        alert("Something went wrong");
+                    }
+                }
+            });
+        })
+        //活動deleteall
+        $(document).on('click', '#delete-post', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+
+            $.ajax({
+                url: "/Dashboard/postdeleteall",
+                type: "Post",
+                data: { id: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showactlist()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+        //儀錶板
+        $("#dashboard").click(function () {
+            $.ajax({
+                url: "/Dashboard/Dashboardview",
+                type: "get",
+                dataType: "html",
+                success: function (data) {
+                    var title = '<lable><h2>儀錶板</lable>';
+                    $("#div-table").html(data);
+                    $('#div-title').html(title);
+                }
+            })
+        })
+        //切換檢舉管理
+        $("#report").click(function () {
+            $.ajax({
+                url: "/Dashboard/showallreport",
+                type: "get",
+                dataType: "html",
+                success: function (data) {
+                    var title = '<lable><h2>留言/檢舉管理</lable>';
+                    $("#div-table").html(data);
+                    $('#div-title').html(title);
+                }
+            });
+        })
+        //幾天
+        function setday(day) {
+            day = parseInt($("#day").val());
+            var d1 = new Date();
+            d1.setTime(d1.setDate(d1.getDate() + day));
+            alert(d1)
+        }
+
+        //幾小時
+        function sethour(hour) {
+            hour = parseInt($("#hour").val());
+            var t1 = new Date();
+            t1.setTime(t1.setHours(t1.getHours() + hour));
+            alert(t1)
+        }
+        //幾分
+        function setmin(min) {
+            min = parseInt($("#sec").val());
+            var m1 = new Date();
+            m1.setTime(m1.setMinutes(m1.getMinutes() + min));
+            //alert(m1)
+        }
+        //幾秒
+        function setsec(sec) {
+            sec = parseInt($("#sec").val());
+            var s1 = new Date();
+            s1.setTime(s1.setSeconds(s1.getSeconds() + sec));
+        }
+        //回傳停權後的總時間
+        function uuu() {
+            var d = $("#day-count").val();
+            var h = $("#hour-count").val();
+            var m = $("#min-count").val();
+
+            var day = 86400000 * d;
+            var hour = 3600000 * h;
+            var min = 60000 * m;
+            var today = new Date().getTime();
+            var total = day + hour + min + today;
+            return (total);
+        }
+        //停權
+        function changestatuschange() {
+            var id = 3059;
+            var p = {
+                Userid: 3059,
+                Recoverytime: uuu(),
+                Status: true,
+            }
+            //alert(JSON.stringify( p));
+            var ans = confirm("確定修改?");
+            if (ans) {
+                $.ajax({
+                    url: "/Dashboard/testrecoverytime/" + id,
+                    type: "post",
+                    dataType: "Json",
+                    data: p,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+        //登出
+        function logout() {
+            confirm("確定登出?")
+            if (confirm) {
+                $.ajax({
+                    url: "/Dashboard/logoutandclear/",
+                    type: "post",
+                    data: { id:@ViewBag.USERID },
+                    dataType: "Json",                    
+                    success: function (data) {
+                        window.location.href = "/test/Login"
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+        //電子報製作
+        $("#newsletter").click(function () {
+            window.location.href = "/Dashboard/newsletter";
+            
+
+            //$.ajax({
+            //    url: "/Dashboard/newsletter",
+            //    type: "get",
+            //    dataType: "html",
+            //    success: function (data) {
+            //        var title = '<lable><h2>電子報編輯</lable>';
+            //        $("#div01").html(data);
+            //        $('#div-title').html(title);
+            //    }
+            //});
+        })
+    </script>
+</body>
+</html>

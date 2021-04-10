@@ -1,0 +1,213 @@
+﻿@*@model IEnumerable<weneedfriend.ViewModels.Post_ViewModel>*@
+@model X.PagedList.PagedList<new_layout_core.ViewModel.Post.Post_ViewModel>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link href="/css/style_post.css" rel="stylesheet"/>
+<style>
+    .imghover {
+        overflow: hidden;
+    }
+        .imghover > img:hover {
+            transform: scale(1.1);
+            transition: .5s;
+        }
+</style>
+
+@{
+    if (Model == null)
+    { return; }
+    int item_count = 0;
+    foreach (var item in Model)
+    {
+        item_count++;
+        <div class="col-lg-6 col-md-12 post" id="post_@item_count">
+            <div class="room-item">
+                <div class="imghover" style="height:200px">
+                    <!--foreach 倫播 未處理-->
+                    @{ if (item.tpostPhotos.Any())
+                        {
+                            foreach (var it in item.tpostPhotos)
+                            {
+                                <a href="/CPost/Post_Detail/@item.tpost.FPostId"><img src="@it.FPostPhoto" alt="@item.tpost.FTitle"></a>
+                            }
+                        }
+                        else
+                        {
+                            <a href="/CPost/Post_Detail/@item.tpost.FPostId"><img src="..." alt="@item.tpost.FTitle"></a>
+                        }
+                    }
+                </div>
+                <div class="ri-text">
+                    <h4 style="margin-bottom:3px">@Html.DisplayFor(modelItem => item.tpost.FTitle)</h4>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-2 col-sm-2" style="height:auto">
+                            <h3 style="margin-bottom:3px">@Html.DisplayFor(modelItem => item.tpost.FSportName)</h3>
+                        </div>
+
+                        <div class="single-widget-area mb-30 col-lg-8 col-md-10 col-sm-10" style="margin-bottom:0">
+                            <!-- Tags Foreach-->
+                            <ol class="popular-tags d-flex flex-wrap">
+                                @foreach (var it in item.tpostTags)
+                                {
+                                    <li><a>@it.TagName</a></li> <!--tagename-->
+                                }
+                            </ol>
+                        </div>
+                    </div>
+
+                    <table id="@item.tpost.FPostId">
+                        <tbody>
+                            <tr>
+                                <td class="r-o">Date:</td>
+                                <td><span>@item.tpost.FPostTime</span></td>
+                            </tr>
+                            <tr>
+                                <td class="r-o">Person:</td>
+                                <td>
+                                    @{ if (item.join_count > item.tpost.FPeople)
+                                        {
+                                            int count = item.join_count - item.tpost.FPeople;
+                                            <span>@item.tpost.FPeople +@count</span><span style="font-size:8px">候補</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.join_count</span>
+                                        }
+
+                                    }
+                                    /<span>@Html.DisplayFor(modelItem => item.tpost.FPeople)人</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="r-o">Address:</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.tpost.FPostCity)，@Html.DisplayFor(modelItem => item.tpost.FPostDistrict)<br />
+                                    <span>@Html.DisplayFor(modelItem => item.tpost.FPostAddress)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="r-o">報名時間:</td>
+                                <td>
+                                    <span>倒數</span>
+                                    <span id="timecount_@item.tpost.FPostId"></span>
+                                    <span id="nonetime_@item.tpost.FPostId" style="display:none">@Html.DisplayFor(modelItem => item.tpost.FPostTime)</span> <!--抓值用-->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="divid">
+                        <a class="primary_post-btn" asp-controller="CPost" asp-action="Post_Detail" asp-route-id="@item.tpost.FPostId" id="@Html.DisplayFor(modelItem => item.tpost.FPostId)">More Details</a>
+                       
+                        <a asp-controller="CPost" asp-action="追蹤用" class="primary_post-btn" style="margin-left:10px">追蹤</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+}
+<div style="width:100%;display:flex;text-align:center;justify-content:center" id="page_controll">
+    <ol class="pagination justify-content-end nikki-pager" id="OrderData">
+        <li value="1"><a href="#bookpost"><i class="fa fa-long-arrow-left" aria-hidden="true" ></i> 上一頁</a></li>
+        @{
+            int page_total;
+            int object_cont = int.Parse(@ViewData["pagecount"].ToString());
+            int page_size = 2;
+            if (object_cont % page_size == 0)
+            {
+                page_total = object_cont / page_size;
+            }
+            else
+            {
+                page_total = (object_cont / page_size) + 1;
+            }
+            for (int i = 1; i <= page_total; i++)
+            {
+                <li><a href="#bookpost" style="width:50px">@i</a></li>
+            }
+            <li value="@page_total"><a href="#bookpost">下一頁 <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
+        }
+
+    </ol>
+</div>
+
+<script>
+
+    var nowpage;
+    var postid;
+    var time;
+    $("#page_controll a").click(function () {
+        nowpage = $(this).text();
+        if ($(this).text() == " 上一頁")
+        {
+            nowpage = $(this).parent().val();
+            console.log(nowpage)
+        }
+        else if ($(this).text() == "下一頁 ")
+        {
+            nowpage = $(this).parent().val();
+            console.log(nowpage)
+        }
+        page()
+    })
+    function page() {
+        $.ajax({
+            type: "POST",
+            dataType: "html",
+            cache:"True",
+            data: { date_in_format: date_in_format, date_out_format: date_out_format, city: city, district: district, sport: sport, star: star ,page:nowpage},
+            url: "/CPost/Post_Index_postsearch",
+            success: function (data) {
+                $("#div1").html(data);
+            },
+            error: function (msg) {
+                alert('error：' + msg);
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        var arr = $('#div1').find('.post table')
+        for (let i = 0; i < arr.length; i++) {
+            let time = $(`#nonetime_${arr[i].id}`).text()
+            if (Date.parse(time) > new Date(Date.now())) {
+                clock(arr[i].id, time)
+            }
+            else {
+                $(`#timecount_${arr[i].id}`).prev().text("")
+                $(`#timecount_${arr[i].id}`).text("已截止").css("color", "red");
+
+            }
+        }
+    });
+
+    function clock(id, t) {
+        setInterval(function () {
+            //let time = Date.parse($(`#timecount_${id}`).text())
+            let time = Date.parse(t) //to milliseconds
+            var x = time - Date.now()  //剩餘
+            let date = new Date(x);
+            let year = date.getFullYear();
+            let month = date.getMonth();
+            //let month = ("0" + (date.getMonth() + 1)).slice(-2);
+            let day = ("0" + date.getDate()).slice(-2);
+            let hour = ("0" + date.getHours()).slice(-2);
+            let min = ("0" + date.getMinutes()).slice(-2);
+            let sec = ("0" + date.getSeconds()).slice(-2);
+            if (month >= 1) {
+                let date_result = `${month}月${day}天${hour}時${min}分${sec}秒`
+                $(`#timecount_${id}`).text(date_result)
+            }
+            else {
+                let date_result = `${day}天${hour}時${min}分${sec}秒`
+                $(`#timecount_${id}`).text(date_result)
+            }
+
+            //console.log(date_result)
+
+        }, 1000)
+    }
+
+
+
+</script>

@@ -1,0 +1,12 @@
+﻿@model new_layout_core.ViewModel.Post.PeopleCount
+@{ if (Model == null)
+    { return; } }
+@{ if (@Model.waited <= 0)
+    {
+        @:<span>@Model.joined</span> / <span>@Model.PeopleTotal</span>人
+    }
+    else
+    {
+        @:<span>@Model.joined +@Model.waited</span><span style="font-size:8px">候補</span> / <span>@Model.PeopleTotal</span>人
+    }
+}

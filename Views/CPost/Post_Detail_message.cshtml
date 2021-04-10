@@ -1,0 +1,125 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.Post.Post_Message>
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+@{ if (Model == null) return;
+    foreach (var item in Model)
+    {
+        <div class="single-comment-item first-comment" style="margin-bottom:5px" id="@item.FPostId">
+            <div class="sc-author">
+                <img src="@item.FUserPhoto" alt="">
+            </div>
+            <div class="sc-text reply" id="reply">
+                <div style="display:inline-block">
+                    <span>@item.FMsgTime</span>
+                    <h5 style="margin-bottom:0">@item.FUserName</h5>
+                    <div class="rating-box" style="display:inline-block;text-align: center;align-items:center; font-size:12px;color:#f5b917">
+                        <div class="rating ratings" style="margin-right:5px">
+                            <div class="empty_star" style="color:#ddd">★★★★★</div>
+                            @{string count = (item.FStart * 20) + "%";} 
+                            <div class="full_star" id="post_avgstar" style="color:#f5b917;width:@count">★★★★★</div>
+                        </div>
+                        @*<span style="color:black;font-size:16px;font-weight:700" id="rating-value">@item.FStart 星</span>*@
+                    </div>
+                </div>
+                <p>
+                    @item.FMsgDesc
+                </p>
+                <a style="cursor:pointer" id="@item.FPostMsgId" class="comment-btn">回覆</a>
+                <a style="cursor:pointer" id="@item.FPostMsgId" class="comment-btn">檢舉</a>
+
+            </div>
+            <div class="leave-comment single-comment-item reply-comment" style="margin-top:5px ;display:none" id="replynew_@item.FPostMsgId">                
+                <form class="comment-form">
+                    <div class="row" id="replybtnon">
+                        <div class="col-lg-10" style="display:flex">
+                            <input type="text" placeholder="Reply..." id="replyDesc" value="" required style="margin-bottom:0">
+                            <a id="addreply_@item.FPostMsgId" class="comment-btn" style="text-align:center;background-color:#dfa974;width:50px;font-size:larger;color:#ffffff;cursor:pointer;line-height:50px">留言</a>                            
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="replylist_@item.FPostMsgId" class="single-comment-item reply-comment">
+           
+        </div>
+    }
+}
+
+<script>
+    var postid;
+    var msgid;
+    var replys = $("#messagelist").children(".first-comment").next("div")
+    var replyid = $("#reply").next("div").attr("id");
+    for (let i = 0; i < replys.length; i++) {
+        var x = replys[i].id
+        msgid = x.replace("replylist_", "")
+        console.log(msgid);
+        $("#reply").next("div").ready(getreply(msgid, replyid));
+    }
+
+    function getreply(msgid, replyid) {
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_replay",
+            data: { msgid: msgid },
+            dataType: "HTML",
+            success: function (result) {
+                document.getElementById("replylist_" + msgid).innerHTML = result
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        })
+    }
+
+    //子留言
+    
+    $("body").on("click", "#reply a", function () {
+        msgid = $(this).attr("id")
+        console.log(msgid)
+        $("#replynew_" + msgid).css("display", "")
+    })
+    $('#replybtnon a').click(function () {
+        let replydsec = $(this).prev().val()
+        postid = $("#reply").parent().attr("id");
+        console.log("cc")
+        if (replydsec == null || replydsec == undefined || replydsec == "") {
+            alert("請輸入留言")
+        }
+        else {
+            
+            $.ajax({
+                url: "/CPost/reply_new",
+                type: "POST",
+                dataType: "HTML",
+                data: {
+                    FPostMsgID: msgid,
+                    FPostID:postid,
+                    FMsgedDesc: replydsec,
+
+                },
+                success: function (result) {
+                    //document.getElementById("replylist_" + msgid).innerHTML = result
+                    $("#replylist_" + msgid).html(result)
+                    $("#replynew_" + msgid).css("display", "none")
+                },
+                error: function (msg) {
+                    alert('error：' + msg.code);
+                }
+            })
+        }
+        
+    })
+    
+   
+    
+   
+    //檢舉
+    $("#reply").children("a").last().click(function () {
+        console.log("!!")
+    })
+</script>

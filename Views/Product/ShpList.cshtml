@@ -1,0 +1,131 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.tProductViewModel>
+    <header class="container">
+        <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <a><img class="d-block w-100" style="width:500px;height:300px" src="/images/4ab65415-fb43-4f30-9e2a-019e6002849b.jpg" alt="First slide"></a>
+</div>
+                <div class="carousel-item">
+                    <a><img class="d-block w-100" style="width:500px;height:300px" src="/images/7c68d540-db6e-4ec1-9401-f7a7af24e42c.jpg" alt="Second slide"></a>
+                </div>
+                <div class="carousel-item">
+                    <a><img class="d-block w-100" style="width:500px;height:300px" src="/images/c9c2dcc7-7f52-498e-9ac6-6199cc8dfeb3.jpg" alt="Third slide"></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <div class="shop__sidebar">
+                    <div class="sidebar__categories">
+                        <div class="section-title">
+                            <h4>產品分類</h4>
+                        </div>
+                        <div class="categories__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading active">
+                                        <a data-toggle="collapse" data-target="#collapseOne">類型</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul id="Category">
+                                                @{ var g = new WeNeedFriendsFINContext().TProductCategories.Select(n => n.FCategoryName);
+                                                    foreach (var a in g)
+                                                    {
+                                                        <li id="@a" value="@a" style="cursor:pointer" >@a</li>
+                                                    }}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading active">
+                                        <a data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true">尺寸</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample" style="">
+                                        <div class="card-body">
+                                            <ul id="size">
+                                                @{var f = new WeNeedFriendsFINContext().TSizeIds.Select(n => n.FSizeName).ToList();
+                                                    foreach (var a in f)
+                                                    {
+                                                        <li id="@a" value="@a" style="cursor:pointer">@a</li>
+                                                    } }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9">
+                <div class="row" id="div123">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-lg-4 col-md-6">
+                            <div class="product__item sale">
+                                <div class="product__item__pic set-bg" data-setbg="@item.Pics.FirstOrDefault().FProductPicPath">
+                                    <ul class="product__hover">
+                                        <li><a href="@item.Pics.FirstOrDefault().FProductPicPath" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                        <li><a onclick="AddToCart(@item.FProductId)"><span class="icon_bag_alt"></span></a></li>
+                                    </ul>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6><a asp-controller="Product" asp-action="ShpSingle" asp-route-id="@item.FProductId">@item.FProductName</a></h6>
+                                    <div class="product__price">$@item.FProductPrice</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-lg-12 text-center">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function AddToCart(productid) {
+        $.ajax({
+            type: "post",
+            url: "/Shopping/ShpCart",
+            data: { id: productid },
+            success: function () {
+                alert("已加入購物車")
+            }
+        });
+    }
+</script>
+<script>
+    $("#Category").children().click(function () {
+        console.log($(this).attr('id'))
+        $.ajax({
+            url: "/Product/select",
+            dataType: "html",
+            type: "post",
+            data: { selectName: $(this).attr('id') },
+            success: function (data) {
+                $("#div123").html(data);
+            },
+            error: function (dd) { alert(dd); }
+        });
+    });
+    $("#size").children().click(function () {
+        console.log($(this).attr('id'))
+        $.ajax({
+            url: "/Product/sizeselect",
+            dataType: "html",
+            type: "post",
+            data: { selectsize: $(this).attr('id') },
+            success: function (data) {
+                $("#div123").html(data);
+            },
+            error: function (dd) { alert(dd); }
+        });
+    });
+</script>

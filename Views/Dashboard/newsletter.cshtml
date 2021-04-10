@@ -1,0 +1,105 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>01dragdrop.html</title>
+    <style>
+        #dragItem {
+            width: 100px;
+            height: 30px;
+            border: 1px solid blue;
+            background-color: beige;
+            margin: 10px
+        }
+
+        .dragItemStyle {
+            width: 100px;
+            height: 30px;
+            border: 1px solid blue;
+            background-color: beige;
+            margin: 10px
+        }
+
+        #dropZone, #dropZone1 {
+            width: 150px;
+            height: 100px;
+            border: 1px solid blue;
+            float: left
+        }
+    </style>
+    
+</head>
+<body>
+    <!-- HTML屬性事件處理程序
+      <div id="dragItem" draggable="true" ondragstart="dragStartHandler(event)">Drag me</div>
+      <div id="dropZone"  ondragover="dragoverHandler(event)" ondrop="dropHandler(event)"></div>
+      <div id="dropZone1"  ondragover="dragoverHandler(event)" ondrop="dropHandler(event)"></div>
+    -->
+    <div id="dragItem" draggable="true">
+    </div>
+    <div id="dropZone">
+    </div>
+    <div id="dropZone1"></div>
+    <img src="http://192.168.36.41/imgs/686716ef-264b-4fc2-9c17-b0c0dbcce806.jpg" />
+    <button id="pushme">pushme</button>
+
+    <script src="~/dashboardjs/site.js"></script>
+    <script src="~/dashboardlib/jquery/dist/jquery.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("dragItem").addEventListener("dragstart", dragStartHandler);
+            document.getElementById("dropZone").addEventListener("dragover", dragoverHandler);
+            document.getElementById("dropZone").addEventListener("drop", dropHandler);
+            document.getElementById("dropZone1").addEventListener("dragover", dragoverHandler);
+            document.getElementById("dropZone1").addEventListener("drop", dropHandler);
+        });
+
+        function dragStartHandler(e) {
+            //儲存要拖放的資料
+            // alert(e.target.id);  //dragItem
+            e.dataTransfer.setData("text/plain", e.target.id);  //dragItem
+        }
+        function dragoverHandler(e) {
+            //取消預設動作
+            e.preventDefault();
+        }
+        function dropHandler(e) {
+            //取消預設動作
+            e.preventDefault();
+            //取出拖放資料
+            var eleID = e.dataTransfer.getData("text/plain");
+            // alert(eleID);//dragItem
+            var eleObj = document.getElementById(eleID);  //div object
+            //建立div元素
+            var divObj = document.createElement("div");  //<div></div>
+            //設定屬性及外觀
+            // alert(eleObj.innerHTML);
+            divObj.innerHTML = eleObj.innerHTML;  //<div>Drag me</div>
+            divObj.setAttribute("class", "dragItemStyle");
+            //新增到dropZone or dropZone1元素後面
+            // alert(e.currentTarget.id);
+            e.currentTarget.appendChild(divObj);
+            // e.target.appendChild(divObj);
+            // this.appendChild(divObj);
+        }
+
+        $("#pushme").click(function () {
+            var post = {
+                to: 'gg51gggg@gmail.com',
+                subject: '987654321',
+                body: $("body").html()
+            };
+            $.ajax({
+                url: "/Dashboard/practicenewsletter",
+                type: "POST",
+                data: post,
+                dataType: "Json",
+                success: function (data) {
+                    alert("成功")
+
+                }
+            })
+        })
+
+    </script>
+</body>
+</html>

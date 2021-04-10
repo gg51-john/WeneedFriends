@@ -1,0 +1,16 @@
+﻿@model new_layout_core.ViewModel.Post.Post_Join_ViewModel
+@{ if (Model == null)
+    { return; } }
+<div class="rd-reviews" style="padding-top:0">
+    <h3 style="margin-bottom:10px">Leader</h3>
+
+    <div class="review-item">
+        <div class="ri-pic">
+            <img src="@Model.member.FUserPhoto" alt="">
+        </div>
+        <div class="ri-text">
+            <h5>@Model.member.FUserName</h5>
+            <span>@Model.joinPerson.FJoinTime 建立</span>
+        </div>
+    </div>
+</div>

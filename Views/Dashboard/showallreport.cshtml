@@ -1,0 +1,586 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @*<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" />*@
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        .tablink {
+            background-color: #555;
+            color: white;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 17px;
+            width: 25%;
+        }
+
+            .tablink:hover {
+                background-color: #777;
+            }
+
+        .tabcontent {
+            color: white;
+            display: none;
+            padding: 100px 20px;
+            height: 100%;
+        }
+
+        #Home {
+            background-color: #E0E0E0;
+        }
+
+        #News {
+            background-color: #E0E0E0;
+        }
+
+        #Contact {
+            background-color: #E0E0E0;
+        }
+
+        #About {
+            background-color: #E0E0E0;
+        }
+
+        .card-box {
+            position: relative;
+            color: #fff;
+            padding: 20px 10px 40px;
+            margin: 0px 0px;
+        }
+
+            .card-box:hover {
+                text-decoration: none;
+                color: #f1f1f1;
+            }
+
+                .card-box:hover .icon i {
+                    font-size: 100px;
+                    transition: 1s;
+                    -webkit-transition: 1s;
+                }
+
+            .card-box .inner {
+                padding: 5px 10px 0 10px;
+            }
+
+            .card-box h3 {
+                font-size: 27px;
+                font-weight: bold;
+                margin: 0 0 8px 0;
+                white-space: nowrap;
+                padding: 0;
+                text-align: left;
+            }
+
+            .card-box p {
+                font-size: 15px;
+            }
+
+            .card-box .icon {
+                position: absolute;
+                top: auto;
+                bottom: 5px;
+                right: 5px;
+                z-index: 0;
+                font-size: 72px;
+                color: rgba(0, 0, 0, 0.15);
+            }
+
+            .card-box .card-box-footer {
+                position: absolute;
+                left: 0px;
+                bottom: 0px;
+                text-align: center;
+                padding: 3px 0;
+                color: rgba(255, 255, 255, 0.8);
+                background: rgba(0, 0, 0, 0.1);
+                width: 100%;
+                text-decoration: none;
+            }
+
+            .card-box:hover .card-box-footer {
+                background: rgba(0, 0, 0, 0.3);
+            }
+
+        .bg-blue {
+            background-color: #00c0ef !important;
+        }
+
+        .bg-green {
+            background-color: #00a65a !important;
+        }
+
+        .bg-orange {
+            background-color: #f39c12 !important;
+        }
+
+        .bg-red {
+            background-color: #d9534f !important;
+        }
+
+        label {
+            color: black;
+        }
+
+        /*tr.detail {
+            display: none;
+            width: 100%;
+        }
+
+            tr.detail div {
+                display: none;
+            }
+
+        .showmore:hover {
+            cursor: pointer;
+        }*/
+    </style>
+</head>
+<body>
+
+    <button class="tablink" onclick="reportpage('article-message', this, '#BEBEBE')" id="articlemessage">文章留言</button>
+    <button class="tablink" onclick="reportpage('article-check', this, '#BEBEBE')" id="articlecheck">被檢舉的文章</button>
+    <button class="tablink" onclick="reportpage('message-report', this, '#BEBEBE')">被檢舉的留言</button>
+    <button class="tablink" onclick="reportpage('jail', this, '#BEBEBE')" id="show-jail-member">集中營</button>
+
+    <div id="article-message" class="tabcontent">
+        <div id="button0">
+
+        </div><br />
+        <div id="article-message-table">
+
+        </div>
+    </div>
+    <div id="article-check" class="tabcontent">
+        <div id="button1">
+
+        </div><br />
+        <div id="all-article-check">
+
+        </div>
+    </div>
+
+    <div id="message-report" class="tabcontent">
+        <div id="message-report-table">
+
+        </div>
+    </div>
+    <div id="jail" class="tabcontent">
+        <div id="button3">
+
+        </div><br />
+        <div id="jail-table">
+
+        </div>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+        function reportpage(pageName, elmnt, color) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+            document.getElementById(pageName).style.display = "block";
+            elmnt.style.backgroundColor = color;
+        }
+
+
+        document.getElementById("articlemessage").click();
+    </script>
+    <script>
+
+        $(document).ready(function () {
+            showarticlemessage();
+
+        })
+        $("#articlecheck").click(function () {
+            showcheckarticle();
+        })
+        //所有被檢舉的文章
+        function showcheckarticle() {
+            $.ajax({
+                url: "/Dashboard/showarticlecheck",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="articlereporttable" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>文章標題<th>檢舉次數';
+                    thead += '<th>動作'
+                    title = '<button type="button" class="btn btn-danger" id="refresh">重新整理</button>&nbsp<button type="button" class="btn btn-danger" id="btn-del-article">刪除</button>&nbsp&nbsp';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="articlecheckdelete" id="articlecheckdelete" value="' + item.articleid + '"/></td>';
+                        ////html += '<td>' + item.articleId + '</td>';
+                        html += '<td>' + item.title + '</td>';
+                        html += '<td>' + item.count + '</td>';
+                        html += '<td><a href="#"  class="showmore">詳細</a></td>';
+                        html += '</tr>';
+                        html += '<tr class="detail">';
+                        html += '<td colspan="3">';
+                        html += '<div>';
+                        html += '<table class="table">'
+                        html += '<tr>';
+                        html += '<td>' + item.title + '</td>';
+                        html += '<td>' + item.userid + '</td>';
+                        html += '</tr>';
+                        html += '</table>'
+                        html += '</div>';
+                        html += '</td>';
+                        html += '</tr>';
+
+                    });
+                    $("#all-article-check").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#button1').html(title);
+                    //$("#all-article-check").dataTable(
+                    //    {
+                    //        "language": {
+                    //            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                    //        },
+                    //        "bDestroy": true
+                    //    }
+                    //);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        $(function () {
+            $('a.showmore').click(function (e) {
+                e.preventDefault();
+
+                // We break and store the result so we can use it to hide
+                // the row after the slideToggle is closed
+                var targetrow = $(this).closest('tr').next('.detail');
+                targetrow.show().find('div').slideToggle('slow', function () {
+                    if (!$(this).is(':visible')) {
+                        targetrow.hide();
+                    }
+                });
+            });
+        });
+        //function showdetail() {
+        //    //$(this).next('div').slideToggle();
+        //    var targetrow = $(this).closest('tr').next('.detail');
+        //    targetrow.show().find('div').slideToggle('slow', function () {
+        //        if (!$(this).is(':visible')) {
+        //            targetrow.hide();
+        //        }
+        //    });
+        //}
+
+
+
+
+        $("#articlemessage").click(function () {
+            showarticlemessage();
+        })
+        //所有文章留言
+        function showarticlemessage() {
+            $.ajax({
+                url: "/Dashboard/showarticlereport",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="all-article-message" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>文章標題<th>會員姓名<th>留言內容<th>日期';
+                    thead += '<th>審核'
+                    title = '<button type="button" class="btn btn-danger" id="refresh">重新整理</button>&nbsp<button type="button" class="btn btn-danger" id="btn-del-articlereport">刪除</button>';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="articlecheckdelete" id="articlecheckdelete" value="' + item.reportid + '"/></td>';
+                        html += '<td>' + item.title + '</td>';
+                        html += '<td>' + item.username + '</td>';
+                        html += '<td>' + item.message + '</td>';
+                        html += '<td>' + item.reporttime + '</td>';
+                        html += '<td><a href="#" onclick="return messagedisplay(' + item.reportid + ')">遮蔽</a>|<a href="#" onclick="return deletemessage(' + item.reportid + ')">刪除</a></td>';
+                        html += '</tr>';
+                    });
+                    $("#article-message-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#button0').html(title);
+                    //$("#all-article-check").dataTable(
+                    //    {
+                    //        "language": {
+                    //            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                    //        },
+                    //        "bDestroy": true
+                    //    }
+                    //);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //刪留言
+        $(document).on('click', '#btn-del-articlereport', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+
+            $.ajax({
+                url: "/Dashboard/deletarticlereport",
+                type: "Post",
+                data: { id: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showarticlemessage()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+        //刪文章
+        $(document).on('click', '#btn-del-article', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+            $.ajax({
+                url: "/Dashboard/deletarticle",
+                type: "Post",
+                data: { id: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showcheckarticle()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+        $("#show-jail-member").click(function () {
+            show();
+        })
+        //jail顯示
+        function showjail() {
+            $.ajax({
+                url: "/Dashboard/showalljail",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="all-article-message" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>會員姓名<th>原因<th>日期';
+                    thead += '<th>狀態<th>動作'
+                    title = '<button type="button" class="btn btn-danger" id="refresh">重新整理</button>&nbsp<button type="button" class="btn btn-danger" id="btn-del-articlereport">刪除</button>';
+                    title += '<label>天:</label>&nbsp<input type="number" id="day-count" min="0" max="9999" />&nbsp&nbsp<label>時:</label>&nbsp<input type="number" id="hour-count" min="0" max="9999" />&nbsp&nbsp';
+                    title += '<label>分:</label>&nbsp<input type="number" id="min-count" min="0" max="9999" />&nbsp<label>秒:</label>&nbsp<input type="number" id="sec-count" min="0" max="9999" />&nbsp<input type="button" id = "sendtojail"  value="確認" class="btn btn-primary btn-sm">';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="articlecheckdelete" id="articlecheckdelete" value="' + item.userid + '"/></td>';
+                        html += '<td>' + item.name + '</td>';
+                        html += '<td>' + item.reason + '</td>';
+                        html += '<td>' + item.date + '</td>';
+                        html += '<td>' + item.status + '</td>';
+                        html += '<td><a href="#" onclick="return messagedisplay(' + item.userid + ')">放行</a>|<a href="#" onclick="return deletemessage(' + item.userid + ')">掰掰</a></td>';
+                        html += '</tr>';
+
+                    });
+                    $("#jail-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#button3').html(title);
+                    //$("#all-article-check").dataTable(
+                    //    {
+                    //        "language": {
+                    //            url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                    //        },
+                    //        "bDestroy": true
+                    //    }
+                    //);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        //停權
+        function changestatuschange() {
+            var id = 2092;
+            var p = {
+                Userid: 2092,
+                Recoverytime: uuu(),
+                Status: true,
+            }
+            //alert(JSON.stringify( p));
+            var ans = confirm("確定修改?");
+            if (ans) {
+                $.ajax({
+                    url: "/Dashboard/testrecoverytime/" + id,
+                    type: "post",
+                    dataType: "Json",
+                    data: p,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+        function uuu() {
+            var d = $("#day-count").val();
+            var h = $("#hour-count").val();
+            var m = $("#min-count").val();
+
+            var day = 86400000 * d;
+            var hour = 3600000 * h;
+            var min = 60000 * m;
+            var today = new Date().getTime();
+            var total = day + hour + min + today;
+            return (total);
+        }
+
+
+        //jail顯示所有會員
+        function show() {
+            $.ajax({
+                url: "/Dashboard/loadmember",
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var table = '<table class="table table-bordered" id="all-article-message" style="text-align:center"><thead><tbody>'
+                    var thead = '<tr><th><input type="checkbox" class="checkall" name="allcheck" id="selectall" /><th>會員姓名<th>手機號碼<th>電子信箱<th>註冊日期<th>目前狀態';
+                    /*thead += '<th>狀態<th>動作'*/
+                    title = '<button type="button" class="btn btn-danger" id="refresh">重新整理</button>&nbsp<button type="button" class="btn btn-danger" id="btn-del-articlereport">刪除</button>';
+                    title += '<label>天:</label>&nbsp<input type="number" id="day-count" min="0" max="9999" />&nbsp&nbsp<label>時:</label>&nbsp<input type="number" id="hour-count" min="0" max="9999" />&nbsp&nbsp';
+                    title += '<label>分:</label>&nbsp<input type="number" id="min-count" min="0" max="9999" />&nbsp<label>秒:</label>&nbsp<input type="number" id="sec-count" min="0" max="9999" />&nbsp<input type="button" onclick="fff()"  value="確認" class="btn btn-primary btn-sm">';
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        var memberstatus = "";
+                        if (item.fstatus == 1) {
+                            memberstatus = '一般會員'
+                        }
+                        else if (item.fstatus == 2) {
+                            memberstatus = '停權'
+                        }
+                        else if (item.fstatus == 3) {
+                            memberstatus = '管理員'
+                        }
+                        html += '<tr>';
+                        html += '<td><input type="checkbox" name="memberdelete" id="memberdelete" value="' + item.fUserId + '"/></td>';
+                        html += '<td>' + item.fUserName + '</td>';
+                        html += '<td>' + item.fUserPhone + '</td>';
+                        html += '<td>' + item.fEmail + '</td>';
+                        html += '<td>' + item.fJoinTime + '</td>';
+                        html += '<td class="status-color">' + memberstatus + '</td>';
+                        html += '</tr>';
+
+
+                    });
+                    $("#jail-table").html(table);
+                    $('thead').html(thead);
+                    $('tbody').html(html);
+                    $('#button3').html(title);
+                    //$("#table").dataTable({
+                    //    "language": {
+                    //        url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Chinese-traditional.json"
+                    //    },
+                    //    "bDestroy": true
+                    //});
+
+                    color()
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+        //jail停權all
+        $(document).on('click', '#sendtojail', function () {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+            var id = selectedall;
+            var p = {
+
+                Recoverytime: uuu(),
+                Status: true,
+            }
+            $.ajax({
+                url: "/Dashboard/testrecoverytime" + id,
+                type: "Post",
+                data: { id: selectedall, Recoverytime: uuu(), Status: true, },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        showmemberlist()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        });
+
+        function fff() {
+            var selectedall = new Array();
+            $('input[type=checkbox]').each(function () {
+                if ($(this).prop('checked')) {
+                    selectedall.push($(this).val());
+                }
+            })
+            var id = selectedall;
+            var p = {
+
+                Recoverytime: uuu(),
+                Status: true,
+            }
+            $.ajax({
+                url: "/Dashboard/testrecoverytime",
+                type: "Post",
+                data: { id: selectedall, Recoverytime: uuu(), Status: true, userid: selectedall },
+                dataType: "Json",
+                success: function (data) {
+                    if (data) {
+                        show()
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                }
+            })
+        }
+
+    </script>
+</body>
+</html>

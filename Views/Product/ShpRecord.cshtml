@@ -1,0 +1,35 @@
+﻿@model IEnumerable<new_layout_core.Models.TmyBuyDetail>
+
+
+
+<div style="margin:0% 20%">
+    <table class="table table-dark table-bordered" style="text-align:center"  id="tablea">
+        <thead>
+            <tr>
+                <th>訂單編號</th>
+                <th>商品名稱</th>
+                <th>購買時間</th>
+                <th>數量</th>
+                <th >單價</th>
+                <th >總金額</th>
+                <th >狀態</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+               @{ foreach (var a in Model)
+                   {
+            <tr>
+                <td>@a.Fid</td>
+                <td>@a.FProductName</td>
+                <td>@a.FBuytime</td>
+                <td>@a.FProductQty</td>
+                <td>@a.FProductPrice</td>
+                <td>@a.FProductTotal</td>
+                <td>@a.FState</td>
+                <td><button type="submit" class="btn btn-outline-success">商品明細</button></td>
+            </tr>}
+                   }
+        </tbody>
+    </table>
+</div>

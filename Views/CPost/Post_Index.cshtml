@@ -1,0 +1,352 @@
+﻿<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-text">
+                    <h2>死宅男快出門曬太陽</h2>
+                    <div class="bt-option">
+                        <a href="/Home/Index">Home</a>
+                        <span>ALLPost</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="blog-content-area section-padding-0-100" style="padding-top:60px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <!-- Blog Posts Area -->
+            <div class="col-12 col-lg-8">
+                <div class="blog-posts-area">
+                    <div class="row">
+
+                        <!-- Section Heading -->
+                        <div class="col-12">
+                            <div class="section-heading">
+                                <h2 id="bookpost">尋找活動</h2>
+                                <p>搜尋結果</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="div1">
+                        <!--postlist container-->
+                    </div>
+
+                </div>
+
+                <!-- Pager -->
+                @*<ol class="nikki-pager" id="OrderData">*@
+                @*<li><a href="#"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> 上一頁</a></li>*@
+                @*<li><a href="#">下一頁 <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>*@
+                @*</ol>*@
+            </div>
+
+            <!-- Blog Sidebar Area -->
+            <div class="col-12 col-sm-9 col-md-6 col-lg-4">
+                <div class="post-sidebar-area">
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-50">
+                        <form class="search-form" action="#" method="post">
+                            <input type="search" name="search" class="form-control" placeholder="搜尋...">
+                            <button><i class="fa fa-send"></i></button>
+                        </form>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <div class="room-booking">
+                            <h3>篩選條件</h3>
+                            <form action="#">
+                                <div class="check-date">
+                                    <label for="date-in">Date to:</label>
+                                    <input type="text" class="date-input" id="date-in">
+                                    <i class="icon_calendar"></i>
+                                    <script>
+                                        $(document).ready(function () {
+                                            $.ajax({
+                                                type: "get",
+                                                dataType: "html",
+                                                url: "/CPost/Post_Index_postlist",
+                                                success: function (data) {
+                                                    $("#div1").html(data);
+                                                },
+                                                error: function (msg) {
+                                                    alert('error：' + msg);
+                                                }
+                                            });
+
+                                            $("#search").click(function () {
+
+                                                $.ajax({
+                                                    type: "POST",
+                                                    dataType: "html",
+                                                    cache: "True",
+                                                    data: { date_in_format: date_in_format, date_out_format: date_out_format, city: city, district: district, sport: sport, star: star },
+                                                    url: "/CPost/Post_Index_postsearch",
+                                                    success: function (data) {
+                                                        $("#div1").html(data);
+                                                    },
+                                                    error: function (msg) {
+                                                        alert('error：' + msg);
+                                                    }
+                                                });
+
+                                            })
+                                        });
+
+
+                                        var date_in = "*";
+                                        var date_out = "*";
+                                        var city = "*";
+                                        var district = "*";
+                                        var sport = "*";
+                                        var star = "*";
+                                        var date_in_format = "*";
+                                        var date_out_format = "*";
+
+                                        //時間轉換
+                                        function datechange(time) {
+                                            let date = new Date(time);
+                                            let year = date.getFullYear();
+                                            let month = ("0" + (date.getMonth() + 1)).slice(-2);
+                                            let day = ("0" + date.getDate()).slice(-2);
+                                            let date_result = `${year}/${month}/${day} 00:00`
+                                            console.log(date_result);
+                                            return date_result
+                                        }
+                                        //時間轉換 end
+                                        $(document).ready(function () {
+                                            $("#date-in").change(function () {
+                                                if (Date.parse($("#date-in").val()) > 0) {
+                                                    console.log($("#date-in").val())
+                                                    console.log(Date.parse($("#date-in").val()))
+                                                    date_in = Date.parse($("#date-in").val())
+                                                    date_in_format = datechange(date_in)
+                                                }
+
+                                            });
+                                            $("#date-out").change(function () {
+                                                date_out = Date.parse($("#date-out").val());
+                                                date_out_format = datechange(date_out)
+                                            });
+                                            $.ajax({
+                                                type: "POST",
+                                                dataType: "Json",
+                                                url: "/CPost/cityoption",
+                                                success: function (data) {
+                                                    for (var i = 0; i < data.length; i++) {
+                                                        $("#city").append("<option value='" + data[i].fCityName + "'>" + data[i].fCityName + "</option>")
+                                                        $("#city").next().children("ul").append("<li data-value class='option'>" + data[i].fCityName + "</li>");
+                                                    }
+                                                },
+                                                error: function (msg) {
+                                                    alert('error：' + msg);
+                                                }
+                                            });
+
+                                            $("#city").change(function () {
+                                                city = $("#city").next().children("span").text();
+                                                $("#district").children().first().nextAll("option").remove();
+                                                $("#district").next().children("ul").children().first().nextAll("li").remove();
+                                                $("#district").next().children("span").text("-");
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "/CPost/districtoption",
+                                                    data: { city: city },
+                                                    success: function (result) {
+                                                        console.log(city)
+                                                        for (var i = 0; i < result.length; i++) {
+                                                            $("#district").append("<option value='" + result[i].fDistrict + "'>" + result[i].fDistrict + "</option>")
+                                                            $("#district").next().children("ul").append("<li data-value class='option'>" + result[i].fDistrict + "</li>");
+                                                        }
+                                                    },
+                                                    error: function (msg) {
+                                                        alert('error：' + msg);
+                                                    }
+                                                });
+                                            });
+                                            $("#district").change(function () {
+                                                district = $("#district").next().children("span").text();
+                                                console.log(district)
+                                            });
+                                        });
+                                    </script>
+
+                                </div>
+                                <div class="check-date">
+                                    <label for="date-out">Date From:</label>
+                                    <input type="text" class="date-input" id="date-out">
+                                    <i class="icon_calendar"></i>
+                                </div>
+                                <div class="select-option">
+                                    <label for="sport">Category:</label>
+                                    <select id="sport">
+                                        <option value="*">-</option>
+                                    </select>
+                                    <script>
+                                        
+                                        $(document).ready(function () {
+
+                                            $.ajax({
+                                                type: "POST",
+                                                dataType: "Json",
+                                                url: "/CPost/sportoption",
+                                                success: function (data) {
+                                                    for (var i = 0; i < data.length; i++) {
+                                                        $("#sport").next().children("ul").append("<li data-value class='option'>" + data[i].fSportName + "</li>");
+                                                    }
+                                                },
+                                                error: function (msg) {
+                                                    alert('error：' + msg);
+                                                }
+                                            });
+                                            $("#sport").change(function () {
+                                                sport = $("#sport").next().children("span").text();
+                                                console.log(sport);
+                                            });
+                                            $("#star").change(function () {
+                                                star = $("#star").next().children("span").text();
+                                                console.log(star);
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                                <div class="select-option">
+                                    <label for="city">縣/市:</label>
+                                    <select id="city">
+                                        <option value="*">-</option>
+                                    </select>
+                                    <script>
+
+                                    </script>
+                                </div>
+                                <div class="select-option">
+                                    <label for="district">地區:</label>
+                                    <select id="district">
+                                        <option value="*">-</option>
+                                    </select>
+
+                                </div>
+                                <div class="select-option">
+                                    <label for="star">Star:</label>
+                                    <select id="star">
+                                        <option value="">-</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="search">Search</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30" style="z-index:0">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>熱門活動標籤</h6>
+                        </div>
+                        <!-- Tags -->
+                        <script>
+                            $(document).ready(function () {
+                                $.ajax({
+                                    url: "/CPost/tagoption",
+                                    type: "POST",
+                                    dataType: "JSON",
+                                    success: function (data) {
+                                        for (var i = 0; i < data.length; i++) {
+                                            console.log(data[i].tagId + data[i].tagName)
+                                            $("#taglist").append(`<li><input type="checkbox" id="${data[i].tagId}"/><label for="${data[i].tagId}"><a style="cursor:pointer">${data[i].tagName}</a></label></li>`);
+                                        }
+                                    },
+                                    error: function (msg) {
+                                        alert('error：' + msg);
+                                    }
+                                })
+                                
+                            })
+                        </script>
+                        <ol class="popular-tags d-flex flex-wrap" id="taglist">
+                            
+                            @*<li><input type="checkbox" id="xx"/><label for="xx"><a style="cursor:pointer">運動</a></label></li>
+                            <li><input type="checkbox" /><a href="#">靜態</a></li>
+                            <li><input type="checkbox" /><a href="#">打球</a></li>
+                            <li><input type="checkbox" /><a href="#">早午餐</a></li>
+                            <li><input type="checkbox" /><a href="#">狗狗</a></li>
+                            <li><input type="checkbox" /><a href="#">統神端火鍋</a></li>
+                            <li><input type="checkbox" /><a href="#">貓</a></li>
+                            <li><input type="checkbox" /><a href="#">廢文</a></li>*@
+                        </ol>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30" style="z-index:0">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>最新活動</h6>
+                        </div>
+                        <div id="newpost" class="single-widget-area mb-30">
+
+                            <script>
+                                $(document).ready(function () {
+                                    console.log("ajax")
+                                    /*$("#btn2").click(function () {*/
+                                    $.ajax({
+                                        type: "POST",
+                                        dataType: "html",
+                                        url: "/CPost/Post_Index_newpost",
+                                        success: function (data) {
+                                            $("#newpost").html(data);
+                                        },
+                                        error: function (msg) {
+                                            alert('error：' + msg);
+                                        }
+                                    });
+                                });
+                            </script>
+
+
+                        </div>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>未定功用</h6>
+                        </div>
+                        <ol class="nikki-archives">
+                            <li><a href="#">施工中</a></li>
+                        </ol>
+
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

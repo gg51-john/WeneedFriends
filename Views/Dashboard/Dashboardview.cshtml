@@ -1,0 +1,375 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box
+        }        
+        body, html {
+            height: 100%;
+            margin: 0;
+       }
+        .tablink {
+            background-color: #555;
+            color: white;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 17px;
+            width: 25%;
+        }
+
+            .tablink:hover {
+                background-color: #777;
+            }
+
+        .tabcontent {
+            color: white;
+            display: none;
+            padding: 100px 20px;
+            height: 100%;
+        }
+
+        #Home {
+            background-color: #E0E0E0;
+        }
+
+        #News {
+            background-color: #E0E0E0;
+        }
+
+        #Contact {
+            background-color: #E0E0E0;
+        }
+
+        #About {
+            background-color: #E0E0E0;
+        }
+
+        .card-box {
+            position: relative;
+            color: #fff;
+            padding: 20px 10px 40px;
+            margin: 0px 0px;
+        }
+
+            .card-box:hover {
+                text-decoration: none;
+                color: #f1f1f1;
+            }
+
+                .card-box:hover .icon i {
+                    font-size: 100px;
+                    transition: 1s;
+                    -webkit-transition: 1s;
+                }
+
+            .card-box .inner {
+                padding: 5px 10px 0 10px;
+            }
+
+            .card-box h3 {
+                font-size: 27px;
+                font-weight: bold;
+                margin: 0 0 8px 0;
+                white-space: nowrap;
+                padding: 0;
+                text-align: left;
+            }
+
+            .card-box p {
+                font-size: 15px;
+            }
+
+            .card-box .icon {
+                position: absolute;
+                top: auto;
+                bottom: 5px;
+                right: 5px;
+                z-index: 0;
+                font-size: 72px;
+                color: rgba(0, 0, 0, 0.15);
+            }
+
+            .card-box .card-box-footer {
+                position: absolute;
+                left: 0px;
+                bottom: 0px;
+                text-align: center;
+                padding: 3px 0;
+                color: rgba(255, 255, 255, 0.8);
+                background: rgba(0, 0, 0, 0.1);
+                width: 100%;
+                text-decoration: none;
+            }
+
+            .card-box:hover .card-box-footer {
+                background: rgba(0, 0, 0, 0.3);
+            }
+
+        .bg-blue {
+            background-color: #00c0ef !important;
+        }
+
+        .bg-green {
+            background-color: #00a65a !important;
+        }
+
+        .bg-orange {
+            background-color: #f39c12 !important;
+        }
+
+        .bg-red {
+            background-color: #d9534f !important;
+        }
+
+
+    </style>
+</head>
+<body onload="startTime()">
+
+    <button class="tablink" onclick="dashboardPage('Home', this, '#BEBEBE')" id="defaultOpen">各項數據</button>
+    <button class="tablink" onclick="dashboardPage('News', this, '#BEBEBE')" >News</button>
+    <button class="tablink" onclick="dashboardPage('Contact', this, '#BEBEBE')">Contact</button>
+    <button class="tablink" onclick="dashboardPage('About', this, '#BEBEBE')">About</button>
+
+    <div id="Home" class="tabcontent">
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-blue">
+                        <div class="inner">
+                            <h3 id="member-number"></h3>
+                            <p> 會員人數 </p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                        </div>
+                        <a href="#" class="card-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-green">
+                        <div class="inner">
+                            <h3 id="to-do"></h3>
+                            <p> 待審核數量 </p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-money" aria-hidden="true"></i>
+                        </div>
+                        <a href="#" class="card-box-footer"><i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-orange">
+                        <div class="inner">
+                            <h3 id="article-count"></h3>
+                            <p> 文章總數 </p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-user-plus" aria-hidden="true"></i>
+                        </div>
+                        <a href="#" class="card-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-red">
+                        <div class="inner">
+                            <h3 id="post-count"></h3>
+                            <p> 活動總數 </p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <a href="#" class="card-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+
+                </div>
+        </div>
+    </div>
+</div> 
+    <div id="News" class="tabcontent" data-role="main">
+        <div id="clock">
+
+        </div>
+        <button type="button" onclick="changestatuschange()">按我就對了</button>
+        <button type="button" class="btn btn-danger" id="setday" onclick="setday()">日</button>
+        <input type="datetime" id="day" />
+        <button type="button" class="btn btn-danger" id="sethour" onclick="sethour()">時</button>
+        <input type="datetime" id="hour" />
+        <button type="button" class="btn btn-dark" id="settime" onclick="setsec()">顯示時間</button>
+        <input type="text" id="sec" /><br /><br />
+        <label>天 : </label>&nbsp<input type="number" id="day-count" min="0" max="9999" />&nbsp&nbsp<label>時 : </label>&nbsp<input type="number" id="hour-count" min="0" max="9999" />&nbsp&nbsp
+        <label>分 : </label>&nbsp<input type="number" id="min-count" min="0" max="9999" />&nbsp<input type="button" onclick="uuu()" value="確認" class="btn btn-primary btn-sm">
+        
+        
+    </div>
+
+    <div id="Contact" class="tabcontent">
+        <h3>Contact</h3>
+        <p>Get in touch, or swing by for a cup of coffee.</p>
+    </div>
+
+    <div id="About" class="tabcontent">
+        <h3>About</h3>
+        <p>Who we are and what we do.</p>
+    </div>
+
+    <script>
+        function dashboardPage(pageName,elmnt,color) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].style.backgroundColor = "";
+  }
+  document.getElementById(pageName).style.display = "block";
+  elmnt.style.backgroundColor = color;
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+    </script>
+    <script>
+        //時鐘
+        $(document).ready(function startTime() {
+                var today = new Date();
+                $("#clock").html(today)
+                var timeoutId = setTimeout(startTime, 500);
+                $("#clock").css("color", "black");
+                $("label").css("color", "black");
+        })
+        //幾天
+        function setday(day) {
+            day = parseInt($("#day").val());
+            var d1 = new Date();
+            d1.setTime(d1.setDate(d1.getDate() + day));
+            alert(d1)
+        }
+
+        //幾小時
+        function sethour(hour) {
+                hour = parseInt($("#hour").val());
+                var t1 = new Date();
+                t1.setTime(t1.setHours(t1.getHours() + hour));
+                alert(t1)
+            }
+        //幾分
+        function setmin(min) {
+                min = parseInt($("#sec").val());
+                var m1 = new Date();
+                m1.setTime(m1.setMinutes(m1.getMinutes() + min));
+                //alert(m1)
+            }
+        //幾秒
+        function setsec(sec) {
+                sec = parseInt($("#sec").val());
+                var s1 = new Date();
+                s1.setTime(s1.setSeconds(s1.getSeconds() + sec));
+                //alert(s1)
+            }
+        //測試相減
+        function setsec(sec) {
+                sec = parseInt($("#sec").val());
+                var k = new Date().getTime();
+                var d = new Date();
+                var d2 = d.getTime();
+                d.setTime(d2 + 1000 * sec);
+                alert(d.getTime() - k);
+            }
+        //回傳停權後的總時間
+        function uuu() {
+            var d = $("#day-count").val();
+            var h = $("#hour-count").val();
+            var m = $("#min-count").val();
+
+                var day = 86400000 * d;
+                var hour = 3600000 * h;
+                var min = 60000 * m;
+            var today = new Date().getTime();
+            var total = day + hour + min + today;
+                return (total);
+            }       
+
+    </script>
+    <script>
+        //停權
+        function changestatuschange() {
+            var id = 3059;
+            var p = {
+                Userid: 3059,
+                Recoverytime: uuu(),
+                Status: true,
+            }
+            //alert(JSON.stringify( p));
+            var ans = confirm("確定修改?");
+            if (ans) {
+                $.ajax({
+                    url: "/Dashboard/testrecoverytime/" + id,
+                    type: "post",
+                    dataType: "Json",
+                    data: p,
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+        //會員人數
+        $(document).ready(function () {
+            $.ajax({
+                url: "/Dashboard/membernumber/",
+                type: "get",
+                dataType: "Json",                
+                success: function (data) {
+                    $("#member-number").text(data);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        })
+        //文章總數
+        $(document).ready(function () {
+            $.ajax({
+                url: "/Dashboard/articlecount/",
+                type: "get",
+                dataType: "Json",
+                success: function (data) {
+                    $("#article-count").text(data);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        })
+        //活動總數
+        $(document).ready(function () {
+            $.ajax({
+                url: "/Dashboard/postcount/",
+                type: "get",
+                dataType: "Json",
+                success: function (data) {
+                    $("#post-count").text(data);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        })
+    </script>
+
+</body>
+</html>

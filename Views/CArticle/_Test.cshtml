@@ -1,0 +1,124 @@
+﻿
+@model X.PagedList.PagedList<new_layout_core.Models.TArticle>;
+@*@model List<Test.Models.TArticle>;*@
+<!-- Section Heading -->
+<div class="row row-cols-1 row-cols-md-2 g-4 " style="padding-right: 15px;">
+    @{
+        foreach (var item in Model)
+        {
+            <div class="col-12 col-sm-6 articleid">
+                <input type="hidden" id="articleid" value="@item.ArticleId" />
+                <div class="single-blog-post mb-50">
+                    <div class="post-thumbnail">
+                        <a href="/CArticle/ArticleDetail/?id=@item.ArticleId">
+                            <img src="@item.Image" style="width:300px; height:200px;">
+                        </a>
+                    </div>
+                    <div class="post-content">
+                        <p class="post-date">@item.Date</p>
+                        <a href="/CArticle/ArticleDetail/?id=@item.ArticleId" class="post-title" id="1">
+                            <h4>@item.ArtTitle</h4>
+                        </a>
+                        <a style="margin-right:10px;" class="like"></a>
+                        <a style="margin-right:10px;" class="report"></a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+</div>
+<div style="width:100%;display:flex;text-align:center;justify-content:center" id="page_controll">
+    <ol class="pagination justify-content-end nikki-pager" id="OrderData">
+        <li value="1"><a href="#bookpost"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> 上一頁</a></li>
+        @{
+            int page_total;
+            int object_cont = int.Parse(@ViewData["pagecount"].ToString());
+            int page_size = 6;
+            if (object_cont % page_size == 0)
+            {
+                page_total = object_cont / page_size;
+            }
+            else
+            {
+                page_total = (object_cont / page_size) + 1;
+            }
+            for (int i = 1; i <= page_total; i++)
+            {
+                <li><a href="#bookpost" style="width:50px">@i</a></li>
+            }
+            <li value="@page_total"><a href="#bookpost">下一頁 <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></li>
+        }
+    </ol>
+</div>
+
+<script>
+    $(document).ready(function () {
+        eachandreports();
+
+    });
+    var nowpage;
+    var catid;
+    var keyword;
+
+    $("#page_controll a").click(function () {
+        nowpage = $(this).text();
+        if ($(this).text() == " 上一頁") {
+            nowpage = $(this).parent().val();
+            //console.log(nowpage)
+        }
+        else if ($(this).text() == "下一頁 ") {
+            nowpage = $(this).parent().val();
+            //console.log(nowpage)
+        }
+        page()
+    })
+    function page() {
+        $.ajax({
+            url: "/CArticle/selectarticle_Test",
+            data: { catid: catid, keyword: keyword, page: nowpage },
+            dataType: "HTML",
+            type: "POST",
+            success: function (result) {
+                $("#articleselect").html(result);
+                $("#searchcontent").val(null);
+            }
+        })
+    }
+
+
+    var item = document.getElementsByClassName("articleid");
+    var everyarticleid = "";
+    function eachandreports() {
+        for (var i = 1; i <= item.length; i++) {
+            var report = "";
+            var like = "";
+            everyarticleid = item[i - 1].getElementsByTagName("input")[0].value;
+            console.log(everyarticleid);
+            var thisArticleReport = document.getElementsByClassName("report")[i - 1];
+            var thisArticleLike = document.getElementsByClassName("like")[i - 1];
+            $.ajax({
+                url: "/CArticleReport/allreportcounts",
+                data: { articleid: everyarticleid },
+                dataType: "JSON",
+                async: false,
+                success: function (data) {
+                    report += '<img src="/images/chat-dots.svg" /> ' + data.result;
+                    thisArticleReport.innerHTML = report;
+                }
+            })
+            $.ajax({
+                url: "/CArticleLike_Check_Store/getlikecounts",
+                data: { articleid: everyarticleid },
+                dataType: "JSON",
+                async: false,
+                success: function (data) {
+                    like += '<img src="/images/suit-heart-fill.svg" /> ' + data.result;
+                    thisArticleLike.innerHTML = like;
+                }
+            })
+        }
+    }
+
+
+</script>

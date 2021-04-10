@@ -1,0 +1,54 @@
+﻿@model List<new_layout_core.Models.TArticle>
+
+<div class="row">
+
+    @{
+        foreach (var item in Model)
+        {
+            <div class="col-md-4 StoreArticle" style="padding:20px;">
+                <div>
+                    <div class="col">
+                        <div class="card h-100">
+                            <input type="hidden" class="articleid" value="@item.ArticleId" />
+                            <a style="cursor:pointer" asp-action="ArticleDetail" asp-controller="CArticle" asp-route-id="@item.ArticleId">
+                                <img src="@item.Image" class="card-img-top">
+                                <div class="card-body">
+                                    <p style="margin-bottom:0px;"><small class="text-muted">@item.Date</small></p>
+                                    <h5 class="card-title myoverflow">@item.ArtTitle</h5>
+                                    <p class="username"></p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        GetNames();
+    })
+    var AllStore = document.getElementsByClassName("StoreArticle");
+    function GetNames() {
+        for (var i = 1; i <= AllStore.length; i++) {
+            var article = AllStore[i - 1].getElementsByTagName("input")[0].value;
+            var now = i - 1;
+            Name(article,now);
+        }
+    }
+    function Name(id,now) {
+        $.ajax({
+            url: "/CArticle/getContent",
+            data: { artid: id },
+            dataType: "JSON",
+            success: function (data) {
+                var html = "";
+                console.log(data);
+                html += data[0].username;
+                AllStore[now].getElementsByClassName("username")[0].innerHTML = html;
+            }
+        })
+    }
+</script>

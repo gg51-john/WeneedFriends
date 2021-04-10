@@ -1,0 +1,20 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.Post.Post_Join_ViewModel>
+@{ if (Model == null)
+    { return; } }
+<div class="rd-reviews" style="padding-top:0">
+    <h3 style="margin-bottom:10px">候補</h3>
+    @{
+        foreach (var item in Model)
+        {
+            <div class="review-item">
+                <div class="ri-pic">
+                    <img src="@item.member.FUserPhoto" alt="">
+                </div>
+                <div class="ri-text">
+                    <h5>@item.member.FUserName</h5>
+                    <span>@item.joinPerson.FJoinTime</span><span>  申請</span>
+                </div>
+            </div>
+        }
+    }
+</div>

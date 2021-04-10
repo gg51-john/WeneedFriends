@@ -1,0 +1,86 @@
+﻿@model new_layout_core.ViewModel.tProductViewModel
+
+<h4 style="text-align:center">新增產品</h4>
+<hr />
+<div   class="card" style="text-align:center; width:500px;height:auto;margin:0 35%">
+    <div class="card-header">
+        <div class="mb-3">
+            <form asp-action="ShpAddProduct" enctype="multipart/form-data" class="row ml-md-3">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="FProductName" class="control-label"></label>
+                    <input asp-for="FProductName" class="form-control" />
+                    <span asp-validation-for="FProductName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FProductQty" class="control-label"></label>
+                    <input asp-for="FProductQty" class="form-control" />
+                    <span asp-validation-for="FProductQty" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FProductPrice" class="control-label"></label>
+                    <input asp-for="FProductPrice" class="form-control" aria-label="Amount (to the nearest dollar)" />
+                    <span asp-validation-for="FProductPrice" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FProductCategoryId" class="control-label"></label><br />
+                    <select asp-for="FProductCategoryId" class="form-control">
+                        @{ var q = new WeNeedFriendsFINContext().TProductCategories.Select(f => f.FCategoryName);
+                            foreach (var a in q)
+                            {
+                                <option value="@a">@a</option>
+ } }
+                    </select>
+                </div>
+                <br />
+                <br />
+                <div class="form-group">
+                    <label asp-for="Size" class="control-label"></label><br />
+                    <select asp-for="Size" class="form-control">
+                        @{ var e = new WeNeedFriendsFINContext().TSizeIds.Select(f => f.FSizeName);
+                            foreach (var a in e)
+                            {
+                                <option value="@a">@a</option>
+ } }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="FProductDescription" class="control-label"></label>
+                    <input asp-for="FProductDescription" class="form-control" />
+                    <span asp-validation-for="FProductDescription" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Pics" class="form-control"></label>
+                    <input type="file" class="form-control" multiple onchange="loadpic(event)" name="imgs" />
+                    <span asp-validation-for="Pics" class="text-danger"></span>
+                    <div class="form-group" id="picdiv" style="width:400px;height:500px;overflow:scroll"></div>
+                    <br />
+                </div> <div class="form-group">
+                    <input type="submit" value="確認" class="btn btn-primary" />
+                </div>
+                <script>
+                    function loadpic(event) {
+                        var picdiv = document.getElementById("picdiv");
+                        for (var i = 0; i < event.target.files.length; i++) {
+                            var img = document.createElement("img");
+                            img.addEventListener("click", function () { (this).remove(); })//新增事件
+                            img.src = URL.createObjectURL(event.target.files[i]);
+                            picdiv.appendChild(img);
+                        };
+                    };
+                </script>
+
+            </form>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="ShpManagement">返回列表</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

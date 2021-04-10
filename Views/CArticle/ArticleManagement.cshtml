@@ -1,0 +1,129 @@
+﻿@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<style>
+    /* Set height of body and the document to 100% to enable "full page tabs" */
+    /*    body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial;
+        }
+
+    */ /* Style tab links */
+    .tablink {
+        background-color: #555;
+        color: white;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-size: 17px;
+        width: 25%;
+    }
+
+        .tablink:hover {
+            background-color: #777;
+        }
+
+    /* Style the tab content (and add height:100% for full page content) */
+    .tabcontent {
+        color: white;
+        display: none;
+        padding: 50px 0px;
+        height: 100%;
+    }
+</style>
+<div class="container">
+    <div style="margin-top:100px;" class="tagcloud">
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('Home')">我的文章</a>
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('News')">收藏文章</a>
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('Contact')">我的活動</a>
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('About')">我的訂單</a>
+    </div>
+    <div id="Home" class="tabcontent">
+        <h3>會員文章管理</h3>
+        <div class="tagcloud">
+            <a asp-action="Create" asp-controller="CArticle" class="btn nikki-btn btn-sm m-2">發布文章</a>
+        </div>
+        <div id="ArticlesPlayer">
+        </div>
+    </div>
+
+    <div id="News" class="tabcontent">
+        <h3>收藏文章</h3>
+        <div id="MyStores">
+        </div>
+    </div>
+
+    <div id="Contact" class="tabcontent">
+        <h3>Contact</h3>
+        <p>Get in touch, or swing by for a cup of coffee.</p>
+    </div>
+
+    <div id="About" class="tabcontent">
+        <h3>About</h3>
+        <p>Who we are and what we do.</p>
+    </div>
+</div>
+<script>
+    var userid = @ViewBag.USERID;
+    $(document).ready(function () {
+        GetArticle(userid);
+        GetMyStores(userid);
+        openPage('Home');
+
+    })
+    function GetArticle(id) {
+        var html = "";
+        $.ajax({
+            url: "/CArticle/OwnersAllArticles",
+            data: { userid: id },
+            dataType: "HTML",
+            success: function (data) {
+                html += data;
+                $("#ArticlesPlayer").html(html);
+            }
+        })
+    }
+    function GetMyStores(id) {
+        var html = "";
+        $.ajax({
+            url: "/CArticleLike_Check_Store/GetMyStores",
+            data: { userid: id },
+            dataType: "HTML",
+            success: function (data) {
+                html += data;
+                $("#MyStores").html(html);
+            }
+        })
+    }
+    //--------------------
+    function openPage(pageName) {
+        // Hide all elements with class="tabcontent" by default */
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Remove the background color of all tablinks/buttons
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].style.backgroundColor = "";
+        }
+        // Show the specific tab content
+        document.getElementById(pageName).style.display = "block";
+    }
+
+
+</script>

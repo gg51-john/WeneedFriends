@@ -1,0 +1,119 @@
+﻿@model new_layout_core.Models.TTag
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<style>
+    .tablink {
+        background-color: #555;
+        color: white;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-size: 17px;
+        width: 25%;
+    }
+
+        .tablink:hover {
+            background-color: #777;
+        }
+
+    /* Style the tab content (and add height:100% for full page content) */
+    .tabcontent {
+        color: white;
+        display: none;
+        padding: 50px 0px;
+        height: 100%;
+    }
+</style>
+<div class="container">
+    <input type="hidden" id="tagid" value="@Model.TagId" />
+    <div style="margin-top:100px;" class="tagcloud">
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('Article')">文章</a>
+        <a class="btn nikki-btn btn-sm m-2" onclick="openPage('Post')">活動</a>
+    </div>
+    <div class="single-widget-area">
+        <div id="tags"></div>
+    </div>
+        <div id="Article" class="tabcontent">
+            <h3># @Model.TagName 文章</h3>
+            <div id="TagArticles">
+            </div>
+        </div>
+
+        <div id="Post" class="tabcontent">
+            <h3># @Model.TagName 活動</h3>
+            <div id="TagPosts">
+            </div>
+        </div>
+    </div>
+    <script>
+        var tagid = $("#tagid").val();
+        $(document).ready(function () {
+            gettags();
+            GetTagsArticle(tagid);
+            //GetTagsPost(tagid);
+            openPage('Article');
+        })
+        function GetTagsArticle(Tagid) {
+            var html = "";
+            $.ajax({
+                url: "/CTag/GetTagArticles",
+                data: { tagid: Tagid },
+                dataType: "HTML",
+                success: function (data) {
+                    html += data;
+                    $("#TagArticles").html(html);
+                }
+            })
+        }
+        //function GetTagsPost(Tagid) {
+        //    var html = "";
+        //    $.ajax({
+        //        url: "/CTag/TagPosts",
+        //        data: { tagid: Tagid },
+        //        dataType: "HTML",
+        //        success: function (data) {
+        //            html += data;
+        //            $("#TagPosts").html(html);
+        //        }
+        //    })
+        //}
+        function gettags() {
+            var html = "";
+            $.ajax({
+                url: "/CTag/gettags",
+                dataType: "json",
+                type: "GET",
+                success: function (data) {
+                    //console.log(data);
+                    html += '<ol class="popular-tags d-flex flex-wrap">';
+                    $.each(data, function (key, item) {
+                        html += '<li><a href="/CTag/TagPage/?tagid=' + item.tagId + '">' + item.tagName + '</a></li>';
+                    })
+                    html += '</div>';
+                    //console.log(html);
+                    $("#tags").html(html);
+                }
+
+            })
+
+        }
+        //--------------------
+        function openPage(pageName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+            // Show the specific tab content
+            document.getElementById(pageName).style.display = "block";
+        }
+    </script>

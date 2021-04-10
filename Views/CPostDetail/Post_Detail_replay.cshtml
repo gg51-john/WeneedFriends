@@ -1,0 +1,54 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.Post.Post_Message_Reply>
+
+
+@{if (Model == null)
+        return;
+    foreach (var item in Model)
+    {
+        <div class="single-comment-item reply-comment" style="padding-left:0; margin-bottom:5px" id="@item.FPostMsgedId">
+            <div class="sc-author">
+                <img src="@item.FUserPhoto" alt="">
+            </div>
+            <div class="sc-text" id="@item.FPostMsgId">
+                <span>@item.FMsgedTime</span>
+                <h5 id="msged_@item.FPostMsgedId">@item.FUserName</h5>
+                <p>
+                    @item.FMsgedDesc
+                </p>
+                <a style="cursor:pointer" class="comment-btn reply-btn" id="msged_report" data-bs-toggle="modal" data-bs-target="#exampleModal1" data-id="@item.FPostMsgedId">檢舉</a>
+            </div>
+        </div>
+    }
+}
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">檢舉原因</h5>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" style="padding-right:3px;padding-left:3px">X</button>
+            </div>
+            <div class="modal-body" style="font-size:x-large;display:flex;justify-content:center">
+                <input type="hidden" id="get_reportedid" />  <!--接值用-->
+                <select id="msged_msg" style="border:solid 2px;border-radius:10px;left:3px">
+                    <option>請選擇</option>
+                    <option>色情內容</option>
+                    <option>暴力</option>
+                    <option>侮辱他人</option>
+                    <option>有害或危險行為</option>
+                    <option>垃圾或有誤導性內容</option>
+                    <option>侵犯隱私</option>
+                </select>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="msged_report_fn()">檢舉</button>
+            </div>
+        </div>
+    </div>
+</div>

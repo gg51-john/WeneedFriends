@@ -1,0 +1,74 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.tProductViewModel>
+
+
+    <table class="table table-dark table-bordered" style="text-align-last:center">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FProductId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FProductQty)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FProductPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FProductCategoryId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(mode => mode.Size)
+                </th>
+                <th class="w-25">
+                    @Html.DisplayNameFor(model => model.FProductDescription)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Pics)
+                </th>
+                <th><a asp-action="ShpAddProduct" class="btn btn-primary btn-large">新增產品</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductQty)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductCategoryId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem=>item.Size)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FProductDescription)
+                    </td>
+                    <td>
+                        @foreach (var sa in item.Pics)
+                        {
+                            <img src="@Url.Content(sa.FProductPicPath)" width="50" height="50" />
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("修改", "EditProduct1", "Product", new { id = item.FProductId }, new { @class = "btn btn-primary btn-large" })
+                        @Html.ActionLink("刪除", "DeleteProduct", "Product", new { id = item.FProductId }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+

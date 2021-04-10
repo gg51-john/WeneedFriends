@@ -1,0 +1,220 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.Post.Post_Message>
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+
+
+@{ if (Model == null) return;
+    foreach (var item in Model)
+    {
+        <div class="single-comment-item first-comment" style="margin-bottom:5px" id="@item.FPostId">
+            <div class="sc-author" id="@item.FPostMsgId">
+                <img src="@item.FUserPhoto" alt="">
+            </div>
+            <div class="sc-text reply" id="reply">
+                <div style="display:inline-block">
+                    <span>@item.FMsgTime</span>
+                    <h5 style="margin-bottom:0">@item.FUserName</h5>
+                    <div class="rating-box" style="display:inline-block;text-align: center;align-items:center; font-size:12px;color:#f5b917">
+                        <div class="rating ratings" style="margin-right:5px">
+                            <div class="empty_star" style="color:#f5b917">☆☆☆☆☆</div>
+                            @{string count = (item.FStart * 20) + "%";}
+                            <div class="full_star" id="post_avgstar" style="color:#f5b917;width:@count">★★★★★</div>
+                        </div>
+                        @*<span style="color:black;font-size:16px;font-weight:700" id="rating-value">@item.FStart 星</span>*@
+                    </div>
+                </div>
+                <p>
+                    @item.FMsgDesc
+                </p>
+                <a style="cursor:pointer" id="msgreply" class="comment-btn">回覆</a>
+                <a href="" style="cursor:pointer" id="msgreport" class="comment-btn" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="@item.FPostMsgId">檢舉</a>
+                @{ if (ViewBag.USERID == item.FUserId)
+                    {
+                        <a style="cursor:pointer" id="msgdel" class="comment-btn">刪除</a>
+                    }
+                }
+            </div>
+            <div class="leave-comment single-comment-item reply-comment" style="margin-top:5px ;display:none" id="replynew_@item.FPostMsgId">
+                <form class="comment-form">
+                    <div class="row" id="replybtnon">
+                        <div class="col-lg-10" style="display:flex">
+                            <input type="text" placeholder="Reply..." id="replyDesc" value="" required style="margin-bottom:0">
+                            <a id="addreply_@item.FPostMsgId" class="comment-btn" style="text-align:center;background-color:#dfa974;width:50px;font-size:larger;color:#ffffff;cursor:pointer;line-height:50px">留言</a>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="replylist_@item.FPostMsgId" class="single-comment-item reply-comment replylist">
+
+        </div>
+    }
+}
+
+<script>
+    var postid;
+
+    //get all 主回復
+    var msgid;
+    // get 子回覆ID
+    var msgedid;
+
+    var replys = $("#messagelist").children(".first-comment").next("div")
+    var replyid = $("#reply").next("div").attr("id");
+    for (let i = 0; i < replys.length; i++) {
+        var x = replys[i].id
+        msgid = x.replace("replylist_", "")
+        console.log(msgid);
+
+        $("#reply").next("div").ready(getreply(msgid, replyid));
+        
+
+    }
+    function getreply(msgid, replyid) {
+        $.ajax({
+            type: "POST",
+            url: "/CPostDetail/Post_Detail_replay",
+            data: { msgid: msgid },
+            dataType: "HTML",
+            success: function (result) {
+                document.getElementById("replylist_" + msgid).innerHTML = result
+
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        })
+    }
+
+    // 主回覆 OK
+    $("body").on("click", ".reply #msgreply", function () {
+        msgid = $(this).parent().prev().attr("id")
+        console.log(msgid)
+        $("#replynew_" + msgid).css("display", "")
+    })
+    $('#replybtnon a').click(function () {
+        let replydsec = $(this).prev().val()
+        postid = $("#reply").parent().attr("id");
+        console.log("cc")
+        if (replydsec == null || replydsec == undefined || replydsec == "") {
+            alert("請輸入留言")
+        }
+        else {
+            $.ajax({
+                url: "/CPostDetail/reply_new",
+                type: "POST",
+                dataType: "HTML",
+                data: {
+                    FPostMsgID: msgid,
+                    FPostID: postid,
+                    FMsgedDesc: replydsec,
+                },
+                success: function (result) {
+                    //document.getElementById("replylist_" + msgid).innerHTML = result
+                    $("#replylist_" + msgid).html(result)
+                    $("#replynew_" + msgid).css("display", "none")
+                },
+                error: function (msg) {
+                    alert('error：' + msg.code);
+                }
+            })
+        }
+
+    })
+
+
+
+
+    //主留言檢舉 OK
+
+    $(document).on("click", "#msgreport",function () {
+            $("#get_reportid").val($(this).data("id"))
+        })
+    function msg_report_fn() {
+        msgid = $("#get_reportid").val()
+        console.log(msgid)
+        var msg_report = $("#msg_msg").val()
+        console.log(msg_report)
+        if (msg_report !== "請選擇") {
+            $.ajax({
+             url: "/CPostDetail/Post_Msg_Report",
+                data: { FUserID: @ViewBag.USERID, FPostMsgID: msgid, FMsgReportDesc: msg_report },
+            type: "Post",
+            dataType: "Json",
+            success: function (result) {
+                    alert(result)
+                    },
+            error: function (msg) {
+                    alert('error：' + msg.code);
+                    }
+        })
+        }
+    }
+    //子回覆檢舉 OK
+    $(document).on("click", "#msged_report", function () {
+        $("#get_reportedid").val($(this).data("id"))
+    })
+    function msged_report_fn() {
+        msgedid = $("#get_reportedid").val()
+        console.log(msgedid)
+        var msged_report = $("#msged_msg").val()
+        console.log(msged_report)
+        if (msged_report !== "請選擇") {
+            $.ajax({
+             url: "/CPostDetail/Post_Msged_Report",
+                data: { FUserID: @ViewBag.USERID, FPostMsgedID: msgedid, FMsgedReportDesc: msged_report },
+            type: "Post",
+            dataType: "Json",
+            success: function (result) {
+                    alert(result)
+                    },
+            error: function (msg) {
+                    alert('error：' + msg.code);
+                    }
+        })
+        }
+    }
+
+</script>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">檢舉原因</h5>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" style="padding-right:3px;padding-left:3px">X</button>
+            </div>
+            <div class="modal-body" style="font-size:x-large;display:flex;justify-content:center">
+                <input type="hidden" id="get_reportid"/>  <!--接值用-->
+                <select id="msg_msg" style="border:solid 2px;border-radius:10px;left:3px">
+                    <option>請選擇</option>
+                    <option>色情內容</option>
+                    <option>暴力</option>
+                    <option>侮辱他人</option>
+                    <option>有害或危險行為</option>
+                    <option>垃圾或有誤導性內容</option>
+                    <option>侵犯隱私</option>
+                </select>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="msg_report_fn()">檢舉</button>
+            </div>
+        </div>
+    </div>
+</div>

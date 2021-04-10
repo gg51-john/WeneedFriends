@@ -1,0 +1,22 @@
+﻿@model IEnumerable<new_layout_core.ViewModel.Post.Post_Message>
+
+
+@{if (Model == null)
+        return;
+    foreach (var item in Model)
+    {
+        <div class="single-comment-item reply-comment" style="padding-left:0; margin-bottom:5px">
+            <div class="sc-author">
+                <img src="@item.FUserPhoto" alt="" >
+            </div>
+            <div class="sc-text">
+                <span>@item.FMsgTime</span>
+                <h5>@item.FUserName</h5>
+                <p>
+                    @item.FMsgDesc
+                </p>
+                <a href="#" class="comment-btn reply-btn" id="@item.FPostMsgId">檢舉</a>
+            </div>
+        </div>
+    }
+}

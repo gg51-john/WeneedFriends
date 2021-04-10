@@ -1,0 +1,172 @@
+﻿@model new_layout_core.ViewModel.tProductViewModel
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<!DOCTYPE html>
+<html lang="zxx" id="a">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Ashion Template">
+    <meta name="keywords" content="Ashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ashion | Template</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6" id="sss">
+                </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text" >
+                        <h3>@Model.FProductName<span>Brand: SKMEIMore Men Watches from SKMEI</span></h3>
+                        <div class="product__details__price">$@Model.FProductPrice.0 <span>$@Model.FProductPrice.0 </span></div>
+                        <p>
+                            @Model.FProductDescription;
+                        </p>
+                        <div class="product__details__button">
+                            <div class="quantity">
+                                <span>數量    :</span>
+                                <div class="pro-qty">
+                                    <input type="text" value="1" id="Qty">
+                                </div>
+                            </div>
+                            <a href="#" class="cart-btn" onclick="QtyAddToCart(@Model.FProductId)"><span class="icon_bag_alt"></span> 加入購物車</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">描述</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <p>
+                                    @Model.FProductDescription
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="ShpList">
+                <div class="col-lg-12 text-center">
+                    <div class="related__title">
+                        <h5>相關產品</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+      @*  <div id="ascrail2000" class="nicescroll-rails nicescroll-rails-vr" style="width: 5px; z-index: auto; background: rgba(0, 0, 0, 0.2); cursor: default; position: absolute; top: 212.4px; left: 306.7px; height: 553.825px; display: none;"><div class="nicescroll-cursors" style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(221, 221, 221); background-clip: padding-box; border-radius: 50px;"></div></div>*@
+    </section>
+    <!-- Product Details Section End -->
+    <!-- Js Plugins -->
+</body>
+</html>
+<script>
+    //載入四筆商品
+    $(function () {
+        /* alert("data")*/
+        $.ajax({
+            url: "/Product/ShpListTable",
+            type: "post",
+            dataType: "Json",
+            success: function (result) {
+                var html = "";
+                $.each(JSON.parse(result), function (Key, item) {
+                    html += '<div class="col-lg-3 col-md-4 col-sm-6">';
+                    html += '<div class="product__item">';
+                    html += '<div class="product__item__pic set-bg" data-setbg="' + item.Pics[0].FProductPicPath + '" style="background-image:url(' + item.Pics[0].FProductPicPath + ')";>';
+                    html += '<div class="label new">New</div>';
+                    html += '<ul class="product__hover">';
+                    html += '<li><a href="/Product/ShpSingle?id=' + item.FProductId + '"><span class="arrow_expand" onclick=ShpSingle(' + item.FProductId + ')></span></a></li>';
+                    html += '<li><a href="javascript:void(0)"><span class="icon_bag_alt" onclick=AddToCart(' + item.FProductId + ')></span></a></li>';
+                    html += '</ul>';
+                    html += '</div>';
+                    html += '<div class="product__item__text">';
+                    html += '<h6><a href="#">' + item.FProductName + '</a></h6>';
+                    html += '<div class="rating">';
+                    html += '<i class="fa fa-stat"></i>';
+                    html += '<i class="fa fa-stat"></i>';
+                    html += '<i class="fa fa-stat"></i>';
+                    html += '<i class="fa fa-stat"></i>';
+                    html += '<i class="fa fa-stat"></i>';
+                    html += '</div>';
+                    html += '<div class="product__price">$ ' + item.FProductPrice + '.0</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    fid = item.FProductId;
+
+                })
+                $('#ShpList').append(html);
+            }
+        })
+    })
+    //$(function () {
+
+    //    $.ajax({
+    //        url: "/Product/ShpImg",
+    //        type: "post",
+    //        dataType: "JSON",
+    //        data:{id:5},
+    //        success: function (as) {
+    //            var html = "";
+    //            $.each(JSON.parse(as), function (Key, item) {
+    //                var a = 1;
+    //                a++;
+    //                html += '<div class="product__details__pic">';
+    //                html += '<div class="product__details__pic__left product__thumb nice-scroll" tabindex="1" style="overflow-y: hidden; outline: none;">';
+    //                html += '<a class="pt active" href="#product-'+a+'">';
+    //                html += '<img src="' + item + '" alt="#"></a>';
+    //                html += '</div>';
+    //                html += '<div class="product__details__slider__content">';
+    //                html += '<div class="product__details__pic__slider owl-carousel owl-loaded">';
+    //                html += '<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(-182px, 0px, 0px); transition: all 0s ease 0s; width: 244px;"><div class="owl-item" style="width: 60.8px;"><img data-hash="product-' + a + '" class="product__big__img" src="' + item + '" alt=""></div><div class="owl-item" style="width: 60.8px;"><img data-hash="product-' + a + '" class="product__big__img" src="' + item + '" alt=""></div><div class="owl-item" style="width: 60.8px;"><img data-hash="product-' + a + '" class="product__big__img" src="' + item + '" alt=""></div><div class="owl-item active" style="width: 60.8px;"><img data-hash="product-' + a +'" class="product__big__img" src="' + item + '" alt=""></div></div></div><div class="owl-nav"><button type="button" role="presentation" class="owl-prev"><i class="arrow_carrot-left"></i></button><button type="button" role="presentation" class="owl-next disabled"><i class="arrow_carrot-right"></i></button></div><div class="owl-dots disabled"></div></div></div ></div >';
+    //                //html += '<div calss="owl-stage-outer">';
+    //                //html += '<div class="owl-item" style="width:60.8px">';
+    //                //html += '<img data-hash="product-'+a+'" class="product__big__img" src="' + item + '" style="background-color:red" alt="#">';
+    //                //html += '</div>';
+    //                //html += '</div>';
+    //                //html += '</div>';
+    //                //html += '</div>';
+    //                //html += '</div>';
+    //            })
+    //            $('#sss').append(html);
+    //        }
+    //    })
+    //})
+    function AddToCart(productid) {
+        $.ajax({
+            type: "post",
+            url: "/Shopping/ShpAddToCart",
+            data: { id: productid },
+            success: function () { alert("已加入購物車") },
+        });
+    }
+    function QtyAddToCart(Productid) {
+        console.log(Productid)
+        const a = document.getElementsByTagName('input');
+        const qty = a[0].value
+        $.ajax({
+            url: "/Product/text2",
+            data: { id: Productid, qty: qty },
+            dataType: "json",
+            type: "post",
+            success: function () {
+                alert("已加入購物車")
+            }
+        })
+    }
+
+</script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

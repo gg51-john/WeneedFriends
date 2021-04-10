@@ -1,0 +1,181 @@
+﻿@model List<new_layout_core.Models.TArticleReport>
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+
+@{
+    if (Model != null)
+    {
+        <h4 class="headline" id="reportcount"></h4>
+        <button style="display:none" value="@Model.FirstOrDefault().ArticleId" id="articleid"></button> 
+    }
+    else
+    {
+        <h4 class="headline" id="reportcount"></h4>
+        <button style="display:none" value="沒有留言" id="articleid"></button>
+    }
+}
+<ol>
+    <!-- Single Comment Area -->
+    @{
+        if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <li class="single_comment_area masterreport" id="masterreport">
+                    <div class="comment-wrapper d-flex">
+                        <input type="hidden" id="reportid" value="@item.ArticleReportId" />
+
+                        <!-- Comment Meta -->
+                        <div class="comment-author UserImage">
+                        </div>
+                        <!-- Comment Content -->
+                        <div class="comment-content">
+                            <div class="dropdown" style="position: absolute; top: 3px; right: 6px;">
+                                <img src="/images/three-dots-vertical.svg" id="master_report" style="cursor:pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="master(@item.ArticleReportId)" />
+                            </div>
+                            <span class="comment-date">@item.ArticleReportTime</span>
+                            <h5 class="UserName"></h5>
+                            <p>@item.ArticleReport</p>
+                            <a class="active" style="cursor:pointer" onclick="report(@item.ArticleReportId)">回覆</a>
+                            <br />
+                            <div id="@item.ArticleReportId"></div>
+
+                        </div>
+                    </div>
+                </li>
+            }
+        }
+    }
+
+</ol>
+
+<script>
+    $(document).ready(function () {
+        if ($("#articleid").val() != "沒有留言") {
+            TakeAllReport();
+            GetAllCount();
+        }
+        });
+
+
+
+    var item = document.getElementsByClassName("masterreport");
+    var html = "";
+    var everyreportid = "";
+    function TakeAllReport() {
+        for (var i = 1; i <= item.length; i++) {
+            var j = i - 1;
+            everyreportid = item[j].getElementsByTagName("input")[0].value;
+            console.log(everyreportid);
+            getSon(j, everyreportid);
+            html = "";
+            everyreportid = "";
+        }
+    }
+    function getSon(j, er_id) {
+        var UserName = "";
+        var UserPhoto = "";
+        $.ajax({
+            url: "/CArticleReport/getreportson",
+            data: { reportid: er_id },
+            dataType: "HTML",
+            cache: false,
+            async: false,
+            success: function (result) {
+                if (result != null) {
+                    console.log("yo man! success!");
+                    item[j].childNodes[2].remove();
+                    html = result;
+                    var div = document.createElement("div");
+                    div.innerHTML = html;
+                    item[j].appendChild(div);
+                }
+            }
+        })
+        $.ajax({
+            url: "/CArticleReport/GetthisReportsUserName",
+            data: { reportid: er_id },
+            dataType: "JSON",
+            async: false,
+            success: function (data) {
+                console.log(data.result);
+                UserName += data.result.name;
+                UserPhoto += '<img src="' + data.result.image+'" style="width:70px; height:70px;">';
+                document.getElementsByClassName("UserName")[j].innerHTML = UserName;
+                document.getElementsByClassName("UserImage")[j].innerHTML = UserPhoto;
+
+            }
+        })
+    }
+
+    function report(id) {
+        document.getElementById(id).innerHTML = '<input class="form-control" type="text" id="text' + id + '"/><a class="comment-btn" style="cursor:pointer" id="a' + id + '" onclick="sendreportson(' + id + ')">回覆留言</a>';
+    }
+    function sendreportson(id) {
+        day = GetTime();
+        $.ajax({
+            url: "/CArticleReport/sendreportson",
+            data: { userid: @ViewBag.USERID, reportid: id, message: $("#text" + id).val(), date: day },
+            async: false,
+            success: function (data) {
+                if (data.result) {
+                    console.log("add success~~~");
+                    TakeAllReport();
+                } else {
+                    console.log("add fail!!!");
+                }
+            }
+        })
+        $("#text" + id).val(null);
+        $("#text" + id).css("display", "none");
+        $("#a" + id).css("display", "none");
+    }
+    function GetTime() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth() + 1;
+        var k = d.getDate();
+        var h = d.getHours();
+        var t = d.getMinutes();
+        var s = d.getSeconds();
+        if (k < 10) {
+            k = "0" + k;
+        }
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (h < 10) {
+            h = "0" + h;
+        }
+        if (t < 10) {
+            t = "0" + t;
+        }
+        if (s < 10) {
+            s = "0" + s;
+        }
+        return (y + '/' + m + '/' + k + " " + h + ":" + t + ":" + s);
+    }
+    function GetAllCount() {
+        var id = $("#articleid").val();
+        var html="";
+        $.ajax({
+            url: "/CArticleReport/allreportcounts",
+            data: { articleid: id },
+            dataType: "JSON",
+            success: function (data) {
+                console.log(data.result);
+                html +=data.result+' 則留言';
+                $("#reportcount").html(html);
+            }
+        })
+    }
+</script>
+
+

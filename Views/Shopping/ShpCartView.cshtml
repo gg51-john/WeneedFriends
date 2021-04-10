@@ -1,0 +1,212 @@
+﻿<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script>
+    //ajax呼叫controller
+    $(function () {
+        $.ajax({
+            type: "post",
+            url: "take/shopping",
+            success: function (result) {
+                var html = "";
+                console.log(result)
+                
+                if (result == null) {
+                    html += '<tr><td style="text-align:center"> 購物車沒有商品</td></tr>';
+                }
+                else
+                {
+                    $.each(result, function (Key, item) {
+                        html += '<tr id=' + item.productId + 'tr>';
+                        html += '<td class="cart__product__item">';
+                        html += '<img src = ' + item.productPics + ' style=width:90px;height:90px>';
+                        html += '<div class="cart__product__item__title">';
+                        html += '<h6> ' + item.productName + '</h6></div> ';
+                        html += '</td>';
+                        html += '<td class="cart_price">$ ' + item.productPrice + '.0</td>';
+                        html += '<td class="cart__quantity">';
+                        html += '<div class="pro-qty">';
+                        html += '<span class="dec qtybtn" style=font-size:25px onclick=reduce(' + item.productId + ')>-</span>';
+                        html += '<input id=' + item.productId + 'qty tyep=text style=font-size:20px value=' + item.productQty + ' />';
+                        html += '<span class="inc qtybtn" style=font-size:25px onclick=Add(' + item.productId + ')>+</span>';
+                        html += '</div>';
+                        html += '</td>';
+                        html += '<td id=' + item.productId + 'price  class="cart__total">$ ' + item.amount + '.0</td>';
+                        html += '<td class="cart__close"><span class=icon_close onclick=del(' + item.productId + ')></span></td>';
+                        html += '</tr>';
+                    });
+                }
+                $('#body').html(html);
+            }, complete: function () {
+                total()
+            }
+        });
+    })
+    //減少數量
+    function reduce(productID) {
+        $.ajax({
+            url: "ShpDelQty/Shopping",
+            type: "post",
+            dataType: "JSON",
+            data: { id: productID },
+            success: function (qty) {
+                console.log(qty)
+                document.getElementById(qty.productId +"qty").value = qty.productQty
+                document.getElementById(qty.productId + "price").innerHTML = '$' + qty.amount + '.0'
+            },
+            complete: function () {
+                total();
+            }
+        });
+    }
+    //增加數量
+    function Add(productID) {
+        $.ajax({
+            url: "ShpAddQty/Shopping",
+            type: "post",
+            dataType: "JSON",
+            data: { id: productID },
+            success: function (qty) {
+                console.log(qty)
+                document.getElementById(qty.productId + "qty").value = qty.productQty
+
+                document.getElementById(qty.productId + "price").innerHTML = '$' + qty.amount + '.0'
+            }, complete: function () { total(); }
+        });
+    }
+    //總金額
+    function total() {
+        $.ajax({
+            url: "ShpTotal/Shopping",
+            type: "post",
+            dataType: "JSON",
+            success: function (total) {
+                document.getElementById('totalmoney').innerHTML = total
+                document.getElementById('money').innerHTML = total
+            }
+        });
+    }
+    //刪除一筆
+    function del(productID) {
+        $.ajax({
+            url: "ShpCartDelete/Shopping",
+            type: "post",
+            dataType: "JSON",
+            data: { id: productID },
+            success: alert("已從購物車移除"),
+            complete: function () { total(); }
+        }).done($('#' + productID + 'tr').hide().remove());
+    }
+    //結帳歐付寶
+    $(function () {
+        $.ajax({
+            url: "/Shopping/OPay",
+            type: "post",
+            success: function (data) {
+                $.each(data, function (key, item) {
+                    document.getElementById("CheckMacValue").value = item[0].checkmacvalue
+                    document.getElementById("MerchantTradeNo").value = item[0].time
+                    document.getElementById("MerchantTradeDate").value = item[0].time3
+                    document.getElementById("ClientBackURL").value = item[0].returnurl
+                    document.getElementById("ReturnURL").value = item[0].succesreturnurl
+                    document.getElementById("TotalAmount").value = item[0].amount
+                    document.getElementById("ItemName").value = item[0].itemname
+                })
+            }
+        })
+    })
+    //結帳完成後存入資料庫
+    function sendtopay() {
+        $.ajax({
+            url: "/Product/ShpPay",
+            success: function () {
+
+            }
+        })
+    }
+</script>
+<section class="shop-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="shop__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>商品名稱</th>
+                                <th>單價</th>
+                                <th>數量</th>
+                                <th>總金額</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="cart__btn">
+                    <a asp-controller="Product" asp-action="ShpList">繼續購物</a>
+                </div>
+            </div>
+           
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="discount__content">
+                    <h6>Discount codes</h6>
+                    <form action="#">
+                        <input type="text" placeholder="Enter your coupon code">
+                        <button type="submit" class="site-btn">Apply</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4 offset-lg-2">
+                <div class="cart__total__procced">
+                    <h6>購物車總結</h6>
+                    <ul>
+                        <li>小計<span id="money">$ </span></li>
+                        <li>總金額 <span id="totalmoney">$ </span></li>
+                    </ul>
+                    <form id="formCreditCard" method="post" accept-charset="UTF-8"
+                          action="https://payment-stage.opay.tw/Cashier/AioCheckOut/V5">
+                        @*MerchantID 商店代號:*@
+                        <input type="text" name="MerchantID" value="2000132" hidden />
+                        @*MerchantTradeNo 商店交易編號:*@
+                        <input type="text" name="MerchantTradeNo" value="DX20210407121400bc73" id="MerchantTradeNo" hidden />
+                        @*MerchantTradeDate 商店交易時間:*@
+                        <input type="text" name="MerchantTradeDate" value="2021/04/07 12:14:00" id="MerchantTradeDate" hidden />
+                        @*PaymentType 交易類型:*@
+                        <input type="text" name="PaymentType" value="aio" hidden />
+                        @*TotalAmount 交易金額:*@
+                        <input type="text" name="TotalAmount" value="6" id="TotalAmount" hidden />
+                        @*TradeDesc 交易描述:*@
+                        <input type="text" name="TradeDesc" value="建立信用卡測試訂單" hidden />
+                        @*ItemName 商品名稱:*@
+                        <input type="text" name="ItemName" value="MacBook 30元X2#iPhone6s 40元X1" id="ItemName" hidden />
+                        @*ReturnURL 付款完成通知回傳網址:*@
+                        <input type="text" name="ReturnURL" value="https://localhost:44399/Product/ShpList" id="ReturnURL" hidden />
+                        @*ChoosePayment 預設付款方式:*@
+                        <input type="text" name="ChoosePayment" value="Credit" hidden />
+                        @*會員商店代碼:*@
+                        <input type="text" name="StoreID" value="" hidden />
+                        @*ClientBackURL Client端返回廠商網址:*@
+                        <input type="text" name="ClientBackURL" value="https://localhost:44399/Product/ShpList" id="ClientBackURL" hidden />
+                        @*CreditInstallment 刷卡分期期數:*@
+                        <input type="text" name="CreditInstallment" value="" hidden />
+                        @*InstallmentAmount 使用刷卡分期的付款金額:*@
+                        <input type="text" name="InstallmentAmount" value="" hidden />
+                        @*Redeem 信用卡是否使用紅利折抵:*@
+                        <input type="text" name="Redeem" value="" hidden />
+                        @*CheckMacValue 簽章類型:*@
+                        <input type="text" name="EncryptType" value="1" hidden />
+                        @*CheckMacValue 檢查碼:*@
+                        <input type="text" name="CheckMacValue" id="CheckMacValue" hidden />
+                        <input class="btn btn-primary btn-lg" type="submit" value="送出訂單" onclick="sendtopay()" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

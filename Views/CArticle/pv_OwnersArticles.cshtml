@@ -1,0 +1,94 @@
+﻿@model List<new_layout_core.Models.TArticle>
+
+
+<table class="table table-hover">
+
+    <tr class="TBC2">
+        <td align="center" nowrap="nowrap">編號</td>
+        <td>標題</td>
+        <td align="center" nowrap="nowrap">發表時間</td>
+        <td align="center" nowrap="nowrap">文章修改</td>
+        <td align="center" nowrap="nowrap">文章刪除</td>
+        <td align="center" nowrap="nowrap">被收藏次數</td>
+        <td align="center" nowrap="nowrap">喜歡人數</td>
+        <td align="center" nowrap="nowrap">留言則數</td>
+
+    </tr>
+
+    @{
+        int count = 0;
+        if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                count++;
+                <tr class="art">
+                    <td class="articleid" style="display:none">@item.ArticleId</td>
+                    <td align="center" nowrap="nowrap">@count</td>
+                    <td><a style="cursor:pointer" asp-action="ArticleDetail" asp-controller="CArticle" asp-route-id="@item.ArticleId">@item.ArtTitle</a></td>
+                    <td align="center" nowrap="nowrap">@item.Date</td>
+                    <td align="center" nowrap="nowrap"><a asp-controller="CArticle" asp-action="ArticleEditorPage" asp-route-articleid="@item.ArticleId">修改</a></td>
+                    <td align="center" nowrap="nowrap"><a asp-controller="CArticle" asp-action="ArticleDelete" asp-route-articleid="@item.ArticleId" onclick="return confirm('確定要刪除嗎?')">刪除</a></td>
+                    <td align="center" nowrap="nowrap" class="store"></td>
+                    <td align="center" nowrap="nowrap" class="like"></td>
+                    <td align="center" nowrap="nowrap" class="report"></td>
+                </tr>
+            }
+        }
+    }
+</table>
+
+<script>
+    $(document).ready(function () {
+        GetArticleDatas();
+    })
+    var AllArticles = document.getElementsByClassName("art");
+    function GetArticleDatas() {
+        for (var i = 1; i <= AllArticles.length; i++) {
+            var id = AllArticles[i - 1].getElementsByClassName("articleid")[0].innerHTML;
+            var count = i - 1;
+            //console.log(id);
+            GetLikes(count, id);
+            GetReports(count, id);
+            GetStores(count, id);
+            //GetStore();
+        }
+    }
+    function GetLikes(count, articleid) {
+        var html = "";
+        $.ajax({
+            url: "/CArticleLike_Check_Store/getlikecounts",
+            data: { articleid: articleid },
+            dataType: "JSON",
+            success: function (data) {
+                html += data.result;
+                AllArticles[count].getElementsByClassName("like")[0].innerHTML = html;
+            }
+        })
+    }
+    function GetReports(count, articleid) {
+        var html = "";
+        $.ajax({
+            url: "/CArticleReport/allreportcounts",
+            data: { articleid: articleid },
+            dataType: "JSON",
+            success: function (data) {
+                html += data.result;
+                AllArticles[count].getElementsByClassName("report")[0].innerHTML = html;
+            }
+        })
+    }
+    function GetStores(count, articleid) {
+        var html = "";
+        $.ajax({
+            url: "/CArticleLike_Check_Store/getstore",
+            data: { articleid: articleid },
+            dataType: "JSON",
+            success: function (data) {
+                html += data.result;
+                AllArticles[count].getElementsByClassName("store")[0].innerHTML = html;
+            }
+        })
+    }
+
+</script>

@@ -1,0 +1,343 @@
+﻿
+@model new_layout_core.ViewModel.Post.Post_Detail
+
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+@{ if (Model == null)
+    { return; } }
+<style>
+    .ratings {
+        position: relative;
+        vertical-align: middle;
+        display: inline-block;
+        color: #ddd; /*背景星星顏色*/
+        overflow: hidden;
+        font-size: 28px; /*調整字體大小可放大縮小星星*/
+        text-shadow: 0px 1px 0 #999;
+    }
+
+    .full_star {
+        width: 90%; /*調整寬度可變更星等*/
+        position: absolute;
+        left: 0;
+        top: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #f5b917;
+        /*前景星星顏色*/
+    }
+</style>
+
+<div class="container" id="divdetail">
+    <!-- ##### Breadcrumb Area Start ##### -->
+    <div class="breadcrumb-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb" id="selectli">
+                            <li class="breadcrumb-item"><a href="/Home/Index"><i class="fa fa-home"></i> 首頁</a></li>
+                            <li class="breadcrumb-item"><a href="/CPost/Post_Index" id="postList">活動列表</a></li>
+                            <li class="breadcrumb-item active" aria-current="page" id="@Html.DisplayFor(model => model.post.FPostId)">@Html.DisplayFor(model => model.post.FTitle)</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="room-details-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="room-details-item" id="detailmain">
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div id="leader">
+                </div>
+                <div id="joined">
+                </div>
+                <div id="wait">
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <section class="blog-details-section" style="width:100%">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 offset-lg-1" style="margin-left:0">
+                            <div class="blog-details-text">
+                                <div class="comment-option">
+
+                                    <div class="leave-comment">
+                                        <h4>評論</h4>
+                                        <form class="comment-form">
+                                            <div class="row" style="position:relative">
+                                                <div class="col-lg-2">
+                                                    <div class="sc-author">
+                                                        <img src="/img/blog/blog-details/avatar/avatar-3.jpg" alt="" style="border-radius:50%">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <h5>Brandon Kelley</h5>
+                                                    <div class="rating-box" style="display:flex;text-align: start; font-size:22px;color:#f5b917">
+                                                        <div class="rating" style="margin-right:5px">
+                                                            <span class="fa fa-star-o"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                        </div>
+                                                        <span style="color:black" id="rating_value"></span>
+                                                    </div>
+                                                    <textarea placeholder="Messages" id="messageDesc" required value=""></textarea>
+                                                </div>
+                                                <div class="col-lg-12 text-right" style="position:absolute;bottom:0">
+                                                    <a herf="#msgtop" class="site-btn" style="background-color:#dfa974;padding:10px;color:#ffffff;cursor:pointer" id="messagenew">Send Message</a>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <br />
+                                        <hr />
+                                    </div>
+                                    <h4 id="msgtop">所有評論</h4>
+                                    <div id="messagelist">
+
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 offset-lg-1" style="margin-left:0">
+                            推薦文章
+                            
+                        </div>
+                        </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<script>
+    var postid;
+    $(document).ready(function () {
+        postid = $("#selectli").children().last("li").attr('id');
+        //console.log(postid);
+
+        //post load
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_post",
+            data: { id: postid },
+            dataType: "html",
+            success: function (result) {
+                //console.log(postid)
+                $('#detailmain').html(result)
+
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+        //leader load
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_Leader",
+            data: { id: postid },
+            dataType: "html",
+            success: function (result) {
+                $('#leader').html(result)
+
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+        //joinlist load
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_join",
+            data: { id: postid },
+            dataType: "HTML",
+            success: function (result) {
+                $('#joined').html(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+
+
+        //messagelist load
+        $.ajax({
+            type: "POST",
+            url: "/CPostDetail/Post_Detail_message",
+            data: { id: postid },
+            dataType: "HTML",
+            success: function (result) {
+                $('#messagelist').html(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+    });
+    setTimeout(function () { loadaction() }, 500);
+    setTimeout(function () {
+        $("#postdetail").children("a").last().css("visibility", "")
+    }, 1050);
+
+    function loadaction() {
+        //like load
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_likecount",
+            data: { id: postid },
+            dataType: "Html",
+            success: function (result) {
+                $("#postdetail").children("a").first().html(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code)
+            }
+        })
+        //star load
+        starload();
+        //joinbtn load
+        $.ajax({
+            type: "POST",
+            data: { id: postid },
+            url: "/CPost/joinBtncheck",
+            dataType: "JSON",
+            success: function (result) {
+                if (result == "status0") { $("#postdetail").children("a").last().css("visibility", "hidden") }
+                else if (result == "status1") { $("#postdetail").children("a").last().text("JOINED") }
+                else if (result == "status2") { $("#postdetail").children("a").last().text("候補中") }
+                else if (result == "status3") { $("#postdetail").children("a").last().text("JOIN NOW") }
+            },
+            error: function (msg) {
+                alert('error：' + msg.code)
+            }
+        })
+    }
+
+    function starload() {
+        $.ajax({
+            type: "POST",
+            url: "/CPost/Post_Detail_star",
+            dataType: "JSON",
+            data: { id: postid },
+            success: function (result) {
+                $("#post_avgstar").css("width", result.staravg)
+                $("#post_avgstar").parent().next("span").text(result.query + "星")
+            },
+            error: function (msg) {
+                alert('error：' + msg.code)
+            }
+        })
+    }
+</script>
+
+<script>
+    const stars = document.querySelector(".rating").children;
+    var ratingValue = 0;
+    let index //目前選到的星星
+    $(document).ready(function () {
+        //document.getElementById("rating-value").firstChild.innerHTML = "";
+        $("#rating_value").html("請評價");
+        for (let i = 0; i < stars.length; i++) {
+            stars[i].addEventListener("mouseover", function () {
+                console.log(i)
+                //document.getElementById("rating-value").firstChild.innerHTML = "評分中"
+                $("#rating_value").html("評分中");
+                for (let j = 0; j < stars.length; j++) {
+                    stars[j].classList.remove("fa-star")//reset 所有星星
+                    stars[j].classList.add("fa-star-o")
+                }
+                for (let j = 0; j <= i; j++) {
+                    stars[j].classList.remove("fa-star-o") //先移除空心的星星
+                    stars[j].classList.add("fa-star") //添加新的星星 如果i=j表示選中的
+                }
+            })
+            stars[i].addEventListener("click", function () {
+                ratingValue = i + 1
+                index = i
+                console.log(ratingValue);
+                $("#rating_value").html(ratingValue + "星");
+            })
+            stars[i].addEventListener("mouseout", function () {
+                for (let j = 0; j < stars.length; j++) {
+                    stars[j].classList.remove("fa-star")//reset 所有星星
+                    stars[j].classList.add("fa-star-o")
+                }
+                for (let j = 0; j <= index; j++) {
+                    stars[j].classList.remove("fa-star-o")
+                    stars[j].classList.add("fa-star")
+                }
+            })
+        }
+    })
+
+    //新增評論(未驗證)
+    var mesg
+    $("#messagenew").click(function () {
+        mesg = $("#messageDesc").val();
+        console.log(mesg)
+        if (mesg !== null || mesg !== "" || mesg !== undefined) {
+            $.ajax({
+                type: "POST",
+                url: "/CPostDetail/message_new",
+                data: {
+                    FPostId: postid,
+                    FMsgDesc: mesg,
+                    FStart: ratingValue,
+                },
+                dataType: "HTML",
+                success: function (result) {
+                    $('#messagelist').html(result);
+                    for (let i = 0; i < replys.length; i++) {
+                        var x = replys[i].id
+                        msgid = x.replace("replylist_", "")
+                        console.log(msgid);
+                        $("#reply").next("div").ready(getreply(msgid, replyid));
+                        window.location.href = "/CPost/Post_Detail/" + postid + "#msgtop"
+                        $("#rating_value").html("請評價");
+                        for (let j = 0; j < stars.length; j++) {
+                            stars[j].classList.remove("fa-star")//reset 所有星星
+                            stars[j].classList.add("fa-star-o")
+                        }
+                        mes = ""
+                    }
+                    starload();
+                },
+                error: function (msg) {
+                    alert('error：' + msg.code);
+                }
+            });
+        }
+
+    });
+</script>

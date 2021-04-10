@@ -1,0 +1,16 @@
+﻿@model new_layout_core.ViewModel.Post.LikeCount
+
+
+@{ if (Model == null)
+    { return; } }
+@{
+    if (Model.ifliked == true)
+    {
+        <i class="icon_heart" style="color:red">  </i><span style="color:black" id="likecount">@Model.Likecount</span>
+    }
+    else
+    {
+        <i class="icon_heart_alt" style="color:red">  </i><span style="color:black" id="likecount">@Model.Likecount</span>
+    }
+}
+@*<i class=" icon_heart_alt" id="@Html.DisplayFor(model => model.tpost.FPostId)">  </i><span id="likecount">@Html.DisplayFor(model => model.tpost.FLikeCount)</span>*@

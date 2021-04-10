@@ -1,0 +1,107 @@
+﻿@model IEnumerable<new_layout_core.Models.TPost>
+
+@{
+    ViewData["Title"] = "testview";
+}
+
+<h1>testview</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FUserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FSportName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPeople)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FLikeCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FSystemTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostCity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostDistrict)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FPostCheck)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FUserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FSportName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPeople)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FLikeCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FSystemTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostCity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostDistrict)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FPostCheck)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

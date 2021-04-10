@@ -1,0 +1,102 @@
+﻿<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+
+<section class="contact-area section-padding-100-0">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-12 col-lg-6">
+                <div class="contact-content mb-100">
+                    <img src="/img/Member/Trip-pana.png" />
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="contact-content mb-100">
+                    <h4 style="margin-bottom:15px;">會員註冊</h4>
+                    <hr />
+                    <!-- Contact Form Area -->
+                    <div class="contact-form-area">
+                        <div class="form-group">
+                            <label class="control-label"></label>
+                            會員帳號(Email):
+                            <input type="email" class="form-control" id="fEmail" placeholder="請輸入會員帳號" onblur="checkemail(this.value)">
+                            <span id="email-label" style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            會員密碼:
+                            <input type="password" class="form-control" id="fPassword" placeholder="請輸入會員密碼" required="required">
+                            <span id='def' style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            會員名稱:
+                            <input type="text" class="form-control" id="fUserName" placeholder="請輸入會員名稱" required="required">
+                            <span id='abc' style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            性別:
+                            <select name="gender" id="gender" class="form-control">
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+
+                            <span id="gender-check" style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            居住城市:
+                            <select name="city" id="city" class="form-control">
+                                <option value="台北市">台北市</option>
+                                <option value="新北市">新北市</option>
+                            </select>
+                            <span id="citydisplay" style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            地區:
+                            <select class="form-control" name="city" id="district" >
+                                <option value="大安區">大安區</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            地址:
+                            <input type="text" class="form-control" id="fAddress" placeholder="請輸入地址" onblur="checkAddress(this.value)">
+                            <span id="addressdisplay" style="color:crimson"></span>
+                        </div>
+
+                        <div class="form-group">
+                            出生年月日:
+                            <input type="date" class="form-control" id="fUserBirthday" placeholder="請輸入出生年月日" onblur="checkBirthdaynull()">
+                            <span id="birthdaydisplay" style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            會員電話:
+                            <input type="text" class="form-control" id="fUserPhone" placeholder="請輸入會員電話" onblur="checkPhone(this.value)">
+                            <span id='phonedisplay' style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            會員照片
+                            <input type="file" class="form-control" id="fUserPhoto" required="required" onblur="photocheck(this.value)">
+                            <span id='memberphoto' style="color:crimson"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="button" value="提交" id="enter" onclick="test()" class="btn nikki-btn btn-sm m-2" />
+                            <a asp-action="Login" class="btn nikki-btn btn-sm m-2">取消</a>
+                            <input type="button" value="Demo" class="btn nikki-btn btn-sm m-2" onclick='quickdemo()' />
+                                       
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- ##### Contact Area End ##### -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="/index/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="/index/js/bootstrap/popper.min.js"></script>
+<script src="/index/js/bootstrap/bootstrap.min.js"></script>
+<script src="/index/js/plugins/plugins.js"></script>
+<script src="/index/js/active.js"></script>
+<script src="~/emailcheck/email.js"></script>

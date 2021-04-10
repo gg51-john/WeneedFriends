@@ -1,0 +1,298 @@
+﻿@model new_layout_core.ViewModel.Post.Post_ViewModel
+
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+@{ if (Model == null)
+    { return; } }
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    .ratings {
+        position: relative;
+        vertical-align: middle;
+        display: inline-block;
+        color: #ddd; /*背景星星顏色*/
+        overflow: hidden;
+        font-size: 28px; /*調整字體大小可放大縮小星星*/
+        text-shadow: 0px 1px 0 #999;
+    }
+
+    .full_star {
+        width: 90%; /*調整寬度可變更星等*/
+        position: absolute;
+        left: 0;
+        top: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #D56A16; /*前景星星顏色*/
+    }
+</style>
+
+<div id="postimg">
+    @{ if (Model.tpostPhotos.Any())
+        {
+            foreach (var it in Model.tpostPhotos)
+            {
+                <img src="@it.FPostPhoto" alt="@Model.tpost.FTitle">
+            }
+        }
+        else
+        {
+            <img src="..." alt="@Model.tpost.FTitle">
+        }
+    }
+</div>
+<div class="rd-text">
+    <div class="rd-title" id="@Html.DisplayFor(model => model.tpost.FPostId)">
+        <h3 style="font-weight:700">@Html.DisplayFor(model => model.tpost.FTitle)</h3>
+        <div class="rdt-right" id="postdetail">
+            <div class="rating-box" style="display:inline-block;text-align: start; font-size:22px;color:#f5b917">
+                <div class="rating ratings" style="margin-right:5px">
+                    <div class="empty_star" style="color:#ddd">★★★★★</div>
+                    @{ string start = (double.Parse(Model.tpost.FLikeCount) * 20) + "%";}
+                    <div class="full_star" id="post_avgstar" style="color:#f5b917;width:@start">★★★★★</div>
+                </div>
+                <span style="color:black;font-size:16px;font-weight:700" id="rating-value">@Model.tpost.FLikeCount</span><span style="color:black;font-size:16px;font-weight:700"></span>
+            </div>
+            <a style="margin:0;cursor:pointer;font-size:large;background-color:transparent" id="@Model.tpost.FPostId"><i class="icon_heart" style="color:red">  </i><span style="color:black" id="likecount"></span></a>
+            <a href="" style="margin:0;font-size:large" id="post_report" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-id="@Model.tpost.FPostId">檢舉</a>
+            <a style="margin:0;cursor:pointer;font-size:large" id="@Html.DisplayFor(model => model.tpost.FPostId)">收藏</a>
+            <a style="margin:0;cursor:pointer;font-size:large;visibility:hidden" id="joinBtn">已結束</a>
+        </div>
+    </div>
+    <h2>@Html.DisplayFor(model => model.tpost.FSportName)<span>小類</span></h2>
+    <table>
+        <tbody>
+            <tr>
+                <td class="r-o"><i class="icon_calendar"></i>Date:</td>
+                <td><span id="posttime">@Html.DisplayFor(model => model.tpost.FPostTime)</span></td>
+            </tr>
+            <tr>
+                <td class="r-o"><i class="icon_profile"></i>參加/報名:</td>
+                <td id="peoplecount">
+                    @{ if (@Model.join_count > @Model.tpost.FPeople)
+                        {
+                            int count = @Model.join_count - @Model.tpost.FPeople;
+                            <span>@Model.tpost.FPeople +@count</span><span style="font-size:8px">候補</span>
+                        }
+                        else
+                        {
+                            <span>@Model.join_count</span>
+                        }
+                    }
+                    /<span>@Html.DisplayFor(model => model.tpost.FPeople)人</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="r-o"><i class="icon_pin_alt"></i>Address:</td>
+                <td>@Html.DisplayFor(model => model.tpost.FPostCity)，@Html.DisplayFor(model => model.tpost.FPostDistrict)，@Html.DisplayFor(model => model.tpost.FPostAddress)</td>
+            </tr>
+            <tr>
+                <td class="r-o"><i class="icon_clock_alt"></i>報名時間:</td>
+                <td><span>倒數</span><span id="countdown">倒數</span></td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="postdesc">
+        <p class="f-para">
+            @Html.DisplayFor(model => model.tpost.FDescription)
+        </p>
+    </div>
+</div>
+
+<script>
+    var postid;
+    console.log(postid)
+    //按讚
+    $("#postdetail").children("a").first().click(function () {
+        postid = $("#postdetail").parent().attr("id");
+        console.log("OK")
+        $.ajax({
+            type: "POST",
+            data: { id: postid },
+            url: "/CPost/Post_Detail_likeclick",
+            dataType: "Html",
+            success: function (result) {
+
+                $("#postdetail").children("a").first().html(result)
+
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+    });
+    $("#postdetail").children("a").last().prev().click(function () {
+        postid = $("#postdetail").parent().attr("id");
+        console.log("OK")
+        $.ajax({
+            type: "POST",
+            data: { FPostID: postid, FUserID:@ViewBag.USERID },
+            url: "/CPostDetail/Post_Post_Store",
+            dataType: "Json",
+            success: function (result) {
+                alert(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+    })
+
+    //報名
+    var btn_name;
+    $("body").on("mouseenter", "#joinBtn", function () {
+        btn_name = $('#joinBtn').text();
+        console.log(btn_name);
+        if (btn_name !== "已結束") {
+            console.log("AA");
+            $("#postdetail").children("a").last().bind("click.join", joinbtn);
+        }
+    })
+    $("body").on("mouseleave", "#joinBtn", function () { $("#postdetail").children("a").last().unbind("click.join", joinbtn); })
+    function joinbtn() {
+        postid = $("#postdetail").parent().attr("id");
+        console.log("OK")
+        $.ajax({
+            type: "POST",
+            data: { id: postid },
+            url: "/CPost/Post_Detail_joinNow",
+            dataType: "Html",
+            async: false,
+            success: function (result) {
+                $('#joined').html(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            data: { id: postid },
+            url: "/CPost/joinBtncheck",
+            dataType: "JSON",
+            async: false,
+            success: function (result) {
+                if (result == "status0") { $("#postdetail").children("a").last().css("visibility", "hidden") }
+                else if (result == "status1") { $("#postdetail").children("a").last().text("JOINED") }
+                else if (result == "status2") { $("#postdetail").children("a").last().text("候補中") }
+                else if (result == "status3") { $("#postdetail").children("a").last().text("JOIN NOW") }
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+        $.ajax({
+            type: "POST",
+            data: { id: postid },
+            url: "/CPost/Post_Detail_people",
+            dataType: "Html",
+            async: false,
+            success: function (result) {
+                $("#peoplecount").html(result)
+            },
+            error: function (msg) {
+                alert('error：' + msg.code);
+            }
+        });
+
+    }
+    //倒數
+    $(document).ready(function () { clock() })
+    function clock() {
+        var s = setInterval(function () {
+            //let time = Date.parse($(`#timecount_${id}`).text())
+            let time = Date.parse($("#posttime").text()) //to millionseconds
+            console.log(time);
+            let timeend = time - Date.now()  //剩餘
+            if (timeend > 0) {
+                let date = new Date(timeend);
+                let year = date.getFullYear();
+                let month = ("0" + (date.getMonth() + 1)).slice(-2);
+                let day = ("0" + date.getDate()).slice(-2);
+                let hour = ("0" + date.getHours()).slice(-2);
+                let min = ("0" + date.getMinutes()).slice(-2);
+                let sec = ("0" + date.getSeconds()).slice(-2);
+                let date_result = `${day}天${hour}時${min}分${sec}秒`
+                //console.log(date_result)
+                $(`#countdown`).text(date_result)
+            }
+            else {
+                $(`#countdown`).prev().text("");
+                $(`#countdown`).text("已截止").css("color", "red")
+                $("#postdetail").children("a").last().text("已結束")
+                //unbind click is not working
+                //var btn_name;
+                //$("body").on("mouseenter", "#joinBtn", function () {
+                //    btn_name = $('#joinBtn').text();
+                //    console.log(btn_name);
+                //    if (btn_name !== "已結束") {
+                //        console.log("AA");
+                //        $("#postdetail").children("a").last().unbind("click.join", joinbtn);
+                //    }
+                //    })
+                clearInterval(s);
+
+            }
+        }, 1000)
+
+    }
+
+
+    var post_report_msg;
+    function post_report_fn(){
+        post_report_msg = $("#post_msg").val()
+        console.log(post_report_msg)
+        console.log(postid)
+        if (post_report_msg !== "請選擇") {
+            $.ajax({
+             url: "/CPostDetail/Post_Post_Report",
+                data: { FUserID: @ViewBag.USERID, FPostID: postid, FPostReportDesc: post_report_msg },
+            type: "Post",
+            dataType: "Json",
+            success: function (result) {
+                    alert(result)
+                    },
+            error: function (msg) {
+                    alert('error：' + msg.code);
+                    }
+        })
+        }
+    }
+</script>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">檢舉原因</h5>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" style="padding-right:3px;padding-left:3px">X</button>
+            </div>
+            <div class="modal-body" style="font-size:x-large;display:flex;justify-content:center">
+                <input type="hidden" id="get_postid" />  <!--接值用-->
+                <select id="post_msg" style="border:solid 2px;border-radius:10px;left:3px">
+                    <option>請選擇</option>
+                    <option>色情內容</option>
+                    <option>暴力</option>
+                    <option>侮辱他人</option>
+                    <option>有害或危險行為</option>
+                    <option>垃圾或有誤導性內容</option>
+                    <option>侵犯隱私</option>
+                </select>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="post_report_fn()">檢舉</button>
+            </div>
+        </div>
+    </div>
+</div>

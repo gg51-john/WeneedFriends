@@ -1,0 +1,31 @@
+﻿@model List<new_layout_core.ViewModel.reportson_ViewModel>
+
+@{
+    if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <ol class="children">
+                <li class="single_comment_area">
+                    <div class="comment-wrapper d-flex">
+                        <div class="comment-author">
+                            <img src="@item.vm_UserImage" style="width:70px;height:70px;">
+                            @*<img src="/index/img/blog-img/10.jpg" alt="">*@
+                        </div>
+                        <div class="comment-content">
+                            <input type="hidden" id="sonid" value="@item.ArticleReportSonId" />
+                            <div class="dropdown" style="position: absolute; top: 3px; right: 6px;">
+                                <img src="/images/three-dots-vertical.svg" id="master_report" style="cursor:pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="sonreport(@item.ArticleReportSonId)" />
+                            </div>
+
+                            <span class="comment-date">@item.ReportTime</span>
+                            <h5 class="SonUserName">@item.vm_UserName</h5>
+                            <p>@item.ReportContent</p>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        }
+    }
+
+}

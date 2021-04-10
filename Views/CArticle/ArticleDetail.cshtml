@@ -1,0 +1,683 @@
+﻿@model new_layout_core.Models.TArticle
+@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+
+
+
+<!-- ##### Breadcrumb Area Start ##### -->
+<div class="breadcrumb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i> 首頁</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="CArticle" asp-action="List">文章</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@Model.ArtTitle</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ##### Breadcrumb Area End ##### -->
+<div class="typography-content-area section-padding-0-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <input type="hidden" id="articleid" value="@Model.ArticleId" />
+                <input type="hidden" id="userid" value="@Model.UserId" />
+
+                <div class="nikki-image mb-30">
+                    <!-- Tag -->
+
+
+                    <div id="arttitle"></div><hr />
+                    <div>
+                        <span style="position: absolute; bottom: 3px; right: 6px;">@Model.Date 發佈</span>
+                        <div class="single-widget-area" id="arttags"></div>
+                    </div>
+                </div>
+
+
+
+                <!-- ArticleContent -->
+                <div class="type-face mb-30">
+                    <div class="col-12">
+                        <!-- Images -->
+                        <img class="mb-30" src="@Model.Image" alt="">
+                    </div>
+                    <div id="articlecontent">
+                    </div>
+                </div>
+
+                <hr />
+                <div id="likecount"></div>
+                <a style="cursor:pointer" class="btn nikki-btn btn-sm m-2" id="Like">喜歡</a>
+                <a style="cursor:pointer" class="btn nikki-btn btn-sm m-2" id="store">收藏</a>
+                <a style="cursor:pointer" class="btn nikki-btn btn-sm m-2" id="check">檢舉</a>
+                <hr />
+
+                <!-- Form & Button -->
+                <div class="form-button">
+                    <h2 class="mb-30">留言</h2>
+
+                    <!-- Contact Form Area -->
+                    <div class="contact-form-area">
+                        <form action="#" method="post">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <textarea class="form-control" id="message" cols="30" rows="10" placeholder="留言..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Buttons -->
+                    <input type="button" value="留言" class="btn nikki-btn btn-sm m-2" id="sendreport">
+                    <div class="d-block mb-30"></div>
+                    <div class="comment_area clearfix" id="report">
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- Blog Sidebar Area -->
+            <div class="col-12 col-sm-9 col-md-6 col-lg-4">
+                <div class="post-sidebar-area">
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-50">
+                        <form class="search-form" action="#" method="post">
+                            <input type="search" name="search" class="form-control" placeholder="文章搜尋...">
+                            <button><i class="fa fa-send"></i></button>
+                        </form>
+                    </div>
+
+
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>關於作者</h6>
+                        </div>
+                        <!-- Thumbnail -->
+                        <div class="about-thumbnail" id="userphoto">
+
+                        </div>
+                        <!-- Content -->
+                        <div class="widget-content text-center">
+                            <br />
+                            <h3 id="username"></h3>
+                            <p>冷笑話大師!</p>
+                        </div>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>作者其他文章</h6>
+                        </div>
+                        <div id="otherarticle" style="margin-bottom:30px;">
+                        </div>
+                    </div>
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>最新文章</h6>
+                        </div>
+                        <div id="newestArticle" style="margin-bottom:30px;">
+                        </div>
+                    </div>
+
+
+
+                    <!-- ##### Single Widget Area ##### -->
+                    <div class="single-widget-area mb-30">
+                        <!-- Title -->
+                        <div class="widget-title">
+                            <h6>熱門標籤</h6>
+                        </div>
+                        <!-- Tags -->
+                        <div id="tags">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var articleid = $("#articleid").val();
+    var userid = @ViewBag.USERID;
+    var flag;
+    var flag_check;
+    var flag_store;
+    $(document).ready(
+        function () {
+            getarticlecontent();
+            hotArticle();
+            gettags();
+            checkhearts();
+            getlike();
+            checkchecks();
+            checkstore();
+            getotherarticle();
+            getreport();
+            console.log("ArticleDetail is ready!");
+        }
+    );
+
+    $(document).on("click", "#dismissmail", function () {
+        console.log("A")
+        
+        $("#exampleModal").removeClass("show");
+        $(".modal-backdrop").removeClass("show");
+    })
+
+    $(document).on("click", "#btnsendmail", function () {
+        
+        var msgid = $("#master-msg").val();
+        var msgreson = $("#msg-check").val();
+        var wherefrom = $("#where-msg").val();
+        console.log("留言ID:" + msgid);
+        console.log("檢舉原因:" + msgreson);
+        if (wherefrom == "主留言") {
+            console.log("留言種類:" + wherefrom);
+            $.ajax({
+                url: "/CArticleLike_Check_Store/msgcheck",
+                data: {
+                    msgid: msgid,
+                    userid: userid,
+                    reson: msgreson
+                },
+                success: function (result) {
+                    if (result.status == "success") {
+                        window.alert("留言檢舉成功!");
+                        //console.log("留言檢舉成功!");
+                    } else {
+                        window.alert(result.result);
+                    }
+                }
+            })
+        } else {
+            console.log("留言種類:子留言");
+            $.ajax({
+                url: "/CArticleLike_Check_Store/msgsoncheck",
+                data: {
+                    msgid: msgid,
+                    userid: userid,
+                    reson: msgreson
+                },
+                success: function (result) {
+                    if (result.status == "success") {
+                        window.alert("留言檢舉成功!");
+                        //console.log("留言檢舉成功!");
+                    } else {
+                        window.alert(result.result);
+                    }
+                }
+            })
+
+
+
+
+        }
+        $("#exampleModal").removeClass("show");
+        $(".modal-backdrop").removeClass("show");
+    })
+    $("#sendreport").click(function () {
+        sendreport();
+    });
+    $("#Like").click(function () {
+        checkhearts();
+        cilckheart();
+    })
+    $("#check").click(function () {
+        checkchecks();
+        cilckcheck();
+    });
+    $("#store").click(function () {
+        checkstore();
+        cilckstore();
+    });
+
+    function sendreport() {
+        var time = GetTime();
+        var message = $("#message").val();
+        $.ajax({
+            url: "/CArticleReport/sendreport",
+            data: {
+                articleid: articleid,
+                userid: userid,
+                message: message,
+                date: time
+            },
+            success: function (data) {
+                if (data) {
+                    console.log("Add success");
+                    $("#message").val(null);
+                    getreport();
+                } else {
+                    console.log("Add fail");
+                    confirm("程序錯誤，請再次嘗試。")
+                }
+            }
+        })
+    };
+    function getlike() {
+        var html = "";
+        $.ajax({
+            url: "/CArticleLike_Check_Store/getlikecounts",
+            data: { articleid: articleid },
+            async: false,
+            cache: false,
+            dataType: "JSON",
+            success: function (data) {
+                var count = data.result;
+                html += '<p><img src="/images/suit-heart-fill.svg" /> ' + count + '</p>';
+                $("#likecount").html(html);
+            }
+        })
+    }
+
+    function checkhearts() {
+        $.ajax({
+            url: "/CArticleLike_Check_Store/checkheart",
+            data: { articleid: articleid, userid: userid },
+            cache: false,
+            async: false,
+            dataType: "JSON",
+            success: function (data) {
+                console.log(data.result);
+                if (data.result == true) {
+                    //alert("有按過")
+                    flag = true;
+                    $("#Like").css("background-color", "#d1bb95");
+                } else {
+                    //alert("沒按過")
+                    flag = false;
+                    $("#Like").css("background-color", "transparent");
+                }
+            }
+        })
+    }
+    function cilckheart() {
+        if (flag) {
+            //true>>移除愛心
+            $.ajax({
+                url: "/CArticleLike_Check_Store/removelike",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                async: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("remove Like success.");
+                        getlike();
+                        $("#Like").css("background-color", "transparent");
+                    } else {
+                        console.log("remove Like fail.");
+                    }
+                }
+            })
+        }
+        else {
+            //false>>增加愛心
+            $.ajax({
+                url: "/CArticleLike_Check_Store/addlike",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("add Like success.");
+                        getlike();
+                        $("#Like").css("background-color", "#d1bb95");
+                    } else {
+                        console.log("add Like fail.");
+                    }
+                }
+            })
+        }
+
+    }
+
+    function getreport() {
+        var html = '';
+        $.ajax({
+            url: "/CArticleReport/getreport/",
+            data: { articleid: articleid },
+            success: function (result) {
+                html = result;
+                console.log("Get report~~!");
+                $("#report").html(html);
+            }
+        })
+    }
+    function GetTime() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth() + 1;
+        var k = d.getDate();
+        var h = d.getHours();
+        var t = d.getMinutes();
+        var s = d.getSeconds();
+        if (k < 10) {
+            k = "0" + k;
+        }
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (t < 10) {
+            t = "0" + t;
+        }
+        if (s < 10) {
+            s = "0" + s;
+        }
+        return (y + '/' + m + '/' + k + " " + h + ":" + t + ":" + s);
+    }
+    function getotherarticle() {
+        $.ajax({
+            url: "/CArticle/userOtherArticle",
+            data: { userid: $("#userid").val() },
+            type: "GET",
+            dataType: "Json",
+            success: function (data) {
+                //console.log(data);
+                var html = '';
+                if (data == null) {
+                    html += '<p>目前沒有最新文章!</p>'
+                } else {
+
+                    $.each(data, function (key, item) {
+                        //console.log(item.Image + "  userOtherArticle");
+                        html += '<div class="single-latest-post d-flex"><div class="post-thumb">';
+                        html += '<img src="' + item.articleImage+'" alt=""></div><div class="post-content">';
+                        html += '<a href="/CArticle/ArticleDetail/?id=' + item.articleId + '" class="post-title">';
+                        html += '<h6>' + item.artTitle + '</h6></a>';
+                        html += '<a href="#" class="post-author"><span>by </span>' + item.userName + '</a></div></div>'
+                    })
+                }
+                $("#otherarticle").html(html);
+            }
+        })
+    }
+    function getarticlecontent() {
+
+        $.ajax({
+            url: "/CArticle/getContent",
+            data: { artid: $("#articleid").val(), userid: $("#userid").val() },
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                //console.log(data);
+                var html = "";
+                var name = "";
+                var title = "";
+                var userimage = "";
+                if (data == null) {
+                    console.log("null");
+                } else {
+                    title += '<h4>' + data[0].art.artTitle + '</h4>';
+                    html += data[0].art.artContent;
+                    name += data[0].username;
+                    userimage += data[0].userphoto;
+                    getarttags();
+                }
+                $("#arttitle").html(title);
+                $("#articlecontent").html(html);
+                $("#username").html(name);
+                document.getElementById("userphoto").innerHTML = '<img src="' + userimage +'" style="width:200px;height:200px;">';
+            }
+        })
+    }
+    function getarttags() {
+        var html = "";
+        $.ajax({
+            url: "/CTag/getarttags",
+            data: { artid: $("#articleid").val() },
+            type: "GET",
+            dataType: "JSON",
+            success: function (data) {
+                if (data != null) {
+                    //console.log("success!gettags!");
+                    //console.log(data);
+                    html += '<ol class="popular-tags d-flex flex-wrap">';
+                    $.each(data, function (key, item) {
+                        html += '<li><a href="/CTag/TagPage/?tagid=' + item.tagid + '">' + item.tagname + '</a></li>';
+                    })
+                    html += '</ol>'
+                    $("#arttags").html(html);
+                } else {
+                    console.log("there is no tags in this article!");
+                }
+            }
+        })
+    }
+    function hotArticle() {
+        $.ajax({
+            url: '/CArticle/newestArticle',
+            type: 'Get',
+            dataType: 'JSON',
+            success: function (data) {
+                var html = '';
+                if (data == null) {
+                    html += '<p>目前沒有最新文章!</p>'
+                } else {
+                    //console.log(data);
+                    $.each(data, function (key, item) {
+                        html += '<div class="single-latest-post d-flex"><div class="post-thumb">';
+                        html += '<img src="' + item.articleImage +'" alt=""></div><div class="post-content">';
+                        html += '<a href="/CArticle/ArticleDetail/?id=' + item.articleId + '" class="post-title">';
+                        html += '<h6>' + item.artTitle + '</h6></a>';
+                        html += '<a href="#" class="post-author"><span>by </span>' + item.userName + '</a></div></div>'
+                    })
+                }
+                $("#newestArticle").html(html);
+            }
+        })
+    };
+    function gettags() {
+        var html = "";
+        $.ajax({
+            url: "/CTag/gettags",
+            dataType: "json",
+            type: "GET",
+            success: function (data) {
+                //console.log(data);
+                html += '<ol class="popular-tags d-flex flex-wrap">';
+                $.each(data, function (key, item) {
+                    html += '<li><a href="' + item.tagId + '">' + item.tagName + '</a></li>';
+                })
+                html += '</div>';
+                $("#tags").html(html);
+            }
+
+        })
+
+    }
+    function checkchecks() {
+        $.ajax({
+            url: "/CArticleLike_Check_Store/checkchecks",
+            data: { articleid: articleid, userid: userid },
+            cache: false,
+            async: false,
+            dataType: "JSON",
+            success: function (data) {
+                console.log(data.result);
+                if (data.result == true) {
+                    //alert("有按過")
+                    flag_check = true;
+                    $("#check").css("background-color", "#d1bb95");
+                    $("#check").html("已檢舉");
+                } else {
+                    //alert("沒按過")
+                    flag_check = false;
+                    $("#check").css("background-color", "transparent");
+                    $("#check").html("檢舉");
+                }
+            }
+        })
+    }
+    function cilckcheck() {
+        if (flag_check) {
+            //true>>移除檢舉
+            $.ajax({
+                url: "/CArticleLike_Check_Store/removecheck",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                async: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("remove check success.");
+                        //getcheck();
+                        $("#check").css("background-color", "transparent");
+                        $("#check").html("檢舉");
+                    } else {
+                        console.log("remove check fail.");
+                    }
+                }
+            })
+        }
+        else {
+            //false>>增加檢舉
+            $.ajax({
+                url: "/CArticleLike_Check_Store/addcheck",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("add check success.");
+                        //getcheck();
+                        $("#check").css("background-color", "#d1bb95");
+                        $("#check").html("已檢舉");
+                    } else {
+                        console.log("add check fail.");
+                    }
+                }
+            })
+        }
+
+    }
+    function checkstore() {
+        $.ajax({
+            url: "/CArticleLike_Check_Store/checkstore",
+            data: { articleid: articleid, userid: userid },
+            cache: false,
+            async: false,
+            dataType: "JSON",
+            success: function (data) {
+                console.log(data.result);
+                if (data.result == true) {
+                    //alert("有按過")
+                    flag_store = true;
+                    $("#store").css("background-color", "#d1bb95");
+                    $("#store").html("已收藏");
+                } else {
+                    //alert("沒按過")
+                    flag_store = false;
+                    $("#store").css("background-color", "transparent");
+                    $("#store").html("收藏");
+                }
+            }
+        })
+    }
+    function cilckstore() {
+        if (flag_store) {
+            //true>>移除檢舉
+            $.ajax({
+                url: "/CArticleLike_Check_Store/removestore",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                async: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("remove store success.");
+                        //getcheck();
+                        $("#store").css("background-color", "transparent");
+                        $("#store").html("收藏");
+                    } else {
+                        console.log("remove store fail.");
+                    }
+                }
+            })
+        }
+        else {
+            //false>>增加檢舉
+            $.ajax({
+                url: "/CArticleLike_Check_Store/addstore",
+                data: { articleid: articleid, userid: userid },
+                cache: false,
+                success: function (result) {
+                    if (result) {
+                        console.log("add store success.");
+                        //getcheck();
+                        $("#store").css("background-color", "#d1bb95");
+                        $("#store").html("已收藏");
+                    } else {
+                        console.log("add store fail.");
+                    }
+                }
+            })
+        }
+
+    }
+    function master(id) {
+        $("#master-msg").val(id);
+        $("#where-msg").val("主留言");
+    }
+
+    function sonreport(id) {
+        $("#master-msg").val(id);
+        $("#where-msg").val("子留言");
+    }
+</script>
+
+@*檢舉*@
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">檢舉原因</h5>
+            </div>
+            <div class="modal-body">
+                @*判斷來源*@
+                <input type="hidden" id="where-msg" value="" />
+                @*塞ID的*@
+                <input type="hidden" id="master-msg" value="" />
+                <select id="msg-check">
+                    <option>惡意謾罵</option>
+                    <option>洗版</option>
+                    <option>垃圾內容或誤導性內容</option>
+                    <option>仇恨或惡意內容</option>
+                    <option>色情內容</option>
+                    <option>侵犯我的權利</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnsendmail">送出</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="dismissmail">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>

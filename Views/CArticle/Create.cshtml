@@ -1,0 +1,295 @@
+﻿@using Microsoft.AspNetCore.Http
+@using new_layout_core.Models;
+
+
+@if (Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID) != null)
+{
+    ViewBag.USER = Context.Session.GetString(CDictionary.CURRENT_LOGINED_USERNAME);
+    ViewBag.USERID = Context.Session.GetInt32(CDictionary.CURRENT_LOGINED_USERID);
+}
+<style>
+    .OK:checked + label > a {
+        background-color: bisque;
+        color: darkolivegreen; 
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.7.6/tinymce.min.js"></script>
+<link rel="icon" href="/index/img/core-img/favicon.ico">
+<link rel="stylesheet" href="/index/Astyle.css">
+<section class="contact-area section-padding-100-0">
+    <div class="container">
+        <div class="centered" style="padding-left:100px ;padding-right:100px">
+            <div class="contact-content mb-100">
+                <form action="#" method="post">
+                    <input type="hidden" value="1" id="userid" />
+                    <input type="hidden" id="datetime" />
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="articleheader" placeholder="文章標題">
+                    </div>
+
+                    <div class="form-group cat" style="padding-bottom:20px">
+                        <select id="articlecategroy">
+                            <option value="1">經驗分享</option>
+                            <option value="2">掃雷專區</option>
+                            <option value="3">情報分享</option>
+                        </select>
+                    </div>
+
+                    <br />
+                    <div class="single-widget-area">
+                        <div id="tags">
+                        </div>
+                        <div class="tag">
+                            <span onclick="opennewtag()" style="color:lightslategray;cursor:pointer;">找不到想要的標籤嗎? 點我新增標籤</span>
+                            <div class="input-group mb-3">
+                                <input type="text" style="display:none;" id="newtag" class="form-control" placeholder="新增標籤" aria-label="新增標籤" aria-describedby="basic-addon2" />
+                                <input style="display:none;" class="btn btn-outline-secondary" type="button" value="新增" id="button-addon2"/>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <textarea class="form-control" placeholder="文章內容" id="articlecontent" style="height: 500px"></textarea>
+                    </div>
+                    <br />
+                    <div>
+                        <input name="progressbarTW_img" type="file" id="imgInp" accept="image/gif, image/jpeg, image/png" required />
+                    </div>
+                    <div>
+                        <br />
+                        <img id="preview_progressbarTW_img" style="max-width:50%;border:1px solid gray;" />
+                    </div>
+                    <br />
+
+
+                    <input type="button" value="新增文章" class="btn nikki-btn btn-sm m-2" id="createArticle">
+                    <input type="button" value="取消" class="btn nikki-btn btn-sm m-2" id="cancel">
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var userid=@ViewBag.USERID;
+    $(document).ready(
+        function () {
+            //getCategory();
+            gettags();
+        }
+    );
+
+    $("#imgInp").change(function () {
+        //當檔案改變後，做一些事
+        readURL(this);   // this代表<input id="imgInp">
+    });
+
+    function opennewtag() {
+        $(".tag input").css("display", "inline");
+    }
+    $("#button-addon2").click(function () {
+        var name = $("#newtag").val();
+        $.ajax({
+            url: "/CTag/createTag",
+            data: { name: name },
+            success: function (data) {
+                if (data.status == "success") {
+                    //window.alert("新增標籤成功");
+                    gettags();
+                   
+                    //document.getElementsByTagName("ol")[0].lastChild.childNodes["input"];
+                    //$("#taglist").children("li").children("input").last().attr("checked", true)
+                    //$(document).ready(function () { $("#taglist").children("li").last().children("a").text("XXX") });
+                    //console.log($("#taglist").children("a").last().text())
+                    //console.log($("#taglist").children("li").last().children().first().val())
+                    $("#newtag").val(null);
+                } else {
+                    window.alert(data.result);
+                }
+            }
+        })
+    })
+
+    //function getCategory() {
+    //    $.ajax({
+    //        url: "/CArticle/AllCategory",
+    //        dataType: "JSON",
+    //        success: function (data) {
+    //            var html = '';
+    //            if (data != null) {
+    //                console.log("category");
+    //                //html += '<select class="form-select form-select-lg" id="articlecategroy">';
+
+    //                $.each(data, function (key, item) {
+    //                    //html += '<option value="' + item.articleCategoryId + '">' + item.articleCategoryName+'</option>';
+
+    //                    //node.value = item.articleCategoryId;
+    //                    //node.label = item.articleCategoryName;
+    //                    document.getElementsByTagName("select")[0].add(new Option(item.articleCategoryName, item.articleCategoryId));
+    //                })
+    //            }
+    //        }
+    //    })
+    //}
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#preview_progressbarTW_img").attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function gettags() {
+        var html = "";
+        $.ajax({
+            url: "/CTag/gettags",
+            dataType: "json",
+            type: "GET",
+            success: function (data) {
+                console.log(data);
+                html += '<ol class="popular-tags d-flex flex-wrap" id="taglist">';
+                $.each(data, function (key, item) {
+                    html += '<li><input class="OK" type="checkbox" style="display:none" id="' + item.tagId + '" value="' + item.tagId + '"/>';
+                    html += '<label for="' + item.tagId + '"><a class="active">' + item.tagName + '</a></label></li>';
+                })
+                html += '</div>';
+                //console.log(html);
+                $("#tags").html(html);
+                
+            }
+        })
+    }
+    var vals = [];
+    var jsonObj = [];
+
+    var newartid;
+    $("#createArticle").click(
+        function () {
+            if (document.getElementById("imgInp").files.length != 0) {
+                var time = GetTime();
+                tinyMCE.triggerSave();
+                var form = new FormData();
+                form.append('ArticleCategoryID', $("#articlecategroy").val());
+                form.append('UserID', userid);
+                form.append('ArtTitle', $("#articleheader").val());
+                form.append('ArtContent', $("#articlecontent").val());
+                form.append('Date', time);
+                form.append('photo', $("#imgInp")[0].files[0]);
+
+                $.ajax({
+                    url: "/CArticle/Create",
+                    data: form,
+                    dataType: "html",
+                    type: "post",
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        newartid = data;
+                        console.log(newartid);
+                        savetags(newartid);
+                    }
+                })
+            } else {
+                window.alert("請選擇照片");
+            }
+        }
+
+    );
+    function savetags(newartid) {
+        $("input[type=checkbox]:checked").each(function () {
+            vals.push($(this).val());
+        });
+        for (i = 0, j = vals.length; i < j; i++) {
+            var obj = new Object;
+            obj.id = vals[i];  //key=id
+            jsonObj.push(obj);
+        }
+        console.log(jsonObj);
+        $.ajax({
+            url: "/CTag/savetags",
+            data: { tagid: JSON.stringify(jsonObj), artid: newartid },
+            type: "GET",
+            success: function (data) {
+                console.log(data);
+                window.location.href = "/CArticle/List"
+            }
+        })
+    }
+    function GetTime() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth() + 1;
+        var k = d.getDate();
+        var h = d.getHours();
+        var t = d.getMinutes();
+        var s = d.getSeconds();
+        if (k < 10) {
+            k = "0" + k;
+        }
+        if (h < 10) {
+            h = "0" + h;
+        }
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (t < 10) {
+            t = "0" + t;
+        }
+        if (s < 10) {
+            s = "0" + s;
+        }
+        return (y + '/' + m + '/' + k + " " + h + ":" + t + ":" + s);
+    }
+
+
+    tinymce.init({
+        menubar: false,
+        selector: 'textarea',
+        //images_upload_url: '/Upload/Post',
+        //automatic_uploads: false,
+        plugins: [
+            'advlist autolink lists link image imagetools charmap print preview anchor textcolor',
+            'searchreplace visualblocks code fullscreen ',
+            'insertdatetime media table contextmenu paste code help wordcount'
+        ],
+        toolbar: 'undo redo |  formatselect | bold italic backcolor forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent  | removeformat | help',
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', 'postAcceptor.php');
+
+            xhr.onload = function () {
+                var json;
+
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+
+                json = JSON.parse(xhr.responseText);
+
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+
+                success(json.location);
+            };
+
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+            xhr.send(formData);
+        }
+    });
+
+</script>
+
+
+
+
